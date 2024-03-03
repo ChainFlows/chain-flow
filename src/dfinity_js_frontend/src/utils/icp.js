@@ -10,6 +10,6 @@ export async function initializeContract() {
     window.auth.identity = authClient.getIdentity();
     window.auth.principal = authClient.getIdentity()?.getPrincipal();
     window.auth.principalText = authClient.getIdentity()?.getPrincipal().toText();
-    window.canister.marketplace = await getMarketplaceCanister();
+    window.canister.chainflow = await getMarketplaceCanister();
     window.canister.ledger = await getLedgerCanister();
 }
