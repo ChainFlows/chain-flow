@@ -417,6 +417,35 @@ export default Canister({
     return Ok(quatationOpt.Some);
   }),
 
+  // sort quatations by company Name in order details  using company Id 
+  sortQuatationsByCompanyName: query(
+    [text],
+    Vec(Types.Quatation),
+    (companyId) => {
+      const quatations = quatationStorage.values();
+      return quatations.filter(
+        (quatation) => quatation.companyId === companyId
+      );
+    }
+  ),
+
+  //  update quatation status
+  updateQuatationStatus: update(
+    [text, text],
+    Result(Types.Quatation, Types.Message),
+    (quatationId, status) => {
+      const quatationOpt = quatationStorage.get(quatationId);
+      if ("None" in quatationOpt) {
+        return Err({ NotFound: `quatation with id=${quatationId} not found` });
+      }
+      const quatation = quatationOpt.Some;
+      quatation.quatationStatus = status;
+      quatationStorage.insert(quatation.id, quatation);
+      return Ok(quatation);
+    }
+  ),
+  
+
   // function to create driver using DriverPayload
   createDriver: update(
     [Types.DriverPayload],
@@ -454,6 +483,8 @@ export default Canister({
       return Ok(driver);
     }
   ),
+
+ 
 
   //   update driver status
   updateDriverStatus: update(
@@ -545,7 +576,7 @@ export default Canister({
         return Err({ NotFound: `driver with id=${driverId} not found` });
       }
       const driver = driverOpt.Some;
-      driver.maintainanceRecords.push(maintainanceRecord.id);
+      driver.maintainanceRecords.push(maintainanceRecord);
       driverStorage.insert(driver.id, driver);
       return Ok(maintainanceRecord);
     }
