@@ -310,10 +310,19 @@ export default Canister({
       }
       const orderDetails = orderDetailsOpt.Some;
       orderDetails.driverId = Some(driverId);
+      // change driver status
+      const driverOpt = driverStorage.get(driverId);
+      if ("None" in driverOpt) {
+        return Err({ NotFound: `driver with id=${driverId} not found` });
+      }
+      const driver = driverOpt.Some;
+      driver.driverStatus = "busy";
+      driverStorage.insert(driver.id, driver);
       orderDetailsStorage.insert(orderDetails.id, orderDetails);
       return Ok(orderDetails);
     }
   ),
+
 
   //   get all order details
   getAllOrderDetails: query([], Vec(Types.OrderDetails), () => {
