@@ -60,7 +60,6 @@ export const SupplyCompany = Record({
   email: text,
   phone: text,
   website: text,
-  owner: Principal,
   ownerName: text,
   supplyChainype: text, // This will be categorized default as Decentralized
   regNo: text,
@@ -146,7 +145,6 @@ export const SupplyCompanyPayload = Record({
   email: text,
   phone: text,
   website: text,
-  owner: Principal,
   ownerName: text,
   supplyChainype: text, // This will be categorized default as Decentralized
   regNo: text,
