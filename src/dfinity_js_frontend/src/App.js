@@ -1,14 +1,16 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { Container, Nav } from "react-bootstrap";
-import Products from "./components/marketplace/Products";
 import "./App.css";
 import Wallet from "./components/Wallet";
 import coverImg from "./assets/img/sandwich.jpg";
 import { login, logout as destroy } from "./utils/auth";
-import { balance as principalBalance } from "./utils/ledger"
+import { balance as principalBalance } from "./utils/ledger";
 import Cover from "./components/utils/Cover";
 import { Notification } from "./components/utils/Notifications";
-
+import HomeLandingpagePage from "./pages/HomeLandingpage";
+import "./styles/tailwind.css";
+import "./styles/index.css";
+import "./styles/font.css";
 
 const App = function AppWrapper() {
   const isAuthenticated = window.auth.isAuthenticated;
@@ -28,7 +30,7 @@ const App = function AppWrapper() {
 
   return (
     <>
-    <Notification />
+      <Notification />
       {isAuthenticated ? (
         <Container fluid="md">
           <Nav className="justify-content-end pt-3 pb-5">
@@ -43,7 +45,7 @@ const App = function AppWrapper() {
             </Nav.Item>
           </Nav>
           <main>
-            <Products />
+            <HomeLandingpagePage />
           </main>
         </Container>
       ) : (

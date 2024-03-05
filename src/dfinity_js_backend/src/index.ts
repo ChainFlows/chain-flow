@@ -186,6 +186,7 @@ export default Canister({
       // Create an event with a unique id generated using UUID v4
       const supplyCompany = {
         id: uuidv4(),
+        owner: ic.caller(),
         drivers: [],
         ...payload,
       };
@@ -323,7 +324,6 @@ export default Canister({
     }
   ),
 
-
   //   get all order details
   getAllOrderDetails: query([], Vec(Types.OrderDetails), () => {
     return orderDetailsStorage.values();
@@ -426,7 +426,7 @@ export default Canister({
     return Ok(quatationOpt.Some);
   }),
 
-  // sort quatations by company Name in order details  using company Id 
+  // sort quatations by company Name in order details  using company Id
   sortQuatationsByCompanyName: query(
     [text],
     Vec(Types.Quatation),
@@ -453,7 +453,6 @@ export default Canister({
       return Ok(quatation);
     }
   ),
-  
 
   // function to create driver using DriverPayload
   createDriver: update(
@@ -467,6 +466,7 @@ export default Canister({
       // Create an event with a unique id generated using UUID v4
       const driver = {
         id: uuidv4(),
+        owner: ic.caller(),
         maintainanceRecords: [],
         trainings: [],
         ...payload,
@@ -492,8 +492,6 @@ export default Canister({
       return Ok(driver);
     }
   ),
-
- 
 
   //   update driver status
   updateDriverStatus: update(

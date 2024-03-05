@@ -1,0 +1,5 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src/dfinity_js_frontend/src"
+  }
+}
