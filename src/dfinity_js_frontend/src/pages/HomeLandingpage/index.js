@@ -13,7 +13,7 @@ export default function HomeLandingpagePage() {
   return (
     <>
       <Helmet>
-        <title>dApp Hackthon-Javascript</title>
+        <title>ChainFlow</title>
         <meta
           name="description"
           content="Web site created using create-react-app"
