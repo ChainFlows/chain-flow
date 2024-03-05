@@ -36,6 +36,7 @@ export const MaintainanceRecord = Record({
 
 export const Driver = Record({
   id: text,
+  owner: Principal,
   fullName: text,
   contactInfo: text,
   trainings: Vec(text), // This will be a list of trainings eg(Carrying Hazardous Materials, Defensive Driving, etc)
@@ -60,6 +61,7 @@ export const SupplyCompany = Record({
   email: text,
   phone: text,
   website: text,
+  owner: Principal,
   ownerName: text,
   supplyChainype: text, // This will be categorized default as Decentralized
   regNo: text,

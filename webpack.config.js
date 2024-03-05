@@ -50,19 +50,17 @@ module.exports = {
         test: /\.(?:js|mjs|cjs)$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
           options: {
-            presets: [
-              ['@babel/preset-env', { targets: "defaults" }]
-            ]
-          }
+            presets: [["@babel/preset-env", { targets: "defaults" }]],
+          },
         },
       },
       {
         test: /\.(png|jpe?g|gif)$/i,
         use: [
           {
-            loader: 'file-loader',
+            loader: "file-loader",
           },
         ],
       },
@@ -70,7 +68,8 @@ module.exports = {
         test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },
-    ]
+      { test: /\.svg$/, use: ["@svgr/webpack"] },
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({

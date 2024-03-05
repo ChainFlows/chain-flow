@@ -1,26 +1,23 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import App from "./App";
-import reportWebVitals from "./reportWebVitals";
 import { initializeContract } from "./utils/icp";
+import "./styles/tailwind.css";
+import "./styles/index.css";
+import "./styles/font.css";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+const container = document.getElementById("root");
+const root = createRoot(container);
+
 window.renderICPromise = initializeContract()
   .then(() => {
-    ReactDOM.render(
+    root.render(
       <React.StrictMode>
         <App />
-      </React.StrictMode>,
-      document.getElementById("root")
+      </React.StrictMode>
     );
-  }).catch(console.error);
-// ReactDOM.render(
-//   <React.StrictMode>
-//     <App />
-//   </React.StrictMode>,
-//   document.getElementById("root")
-// );
-// render(<App />, document.getElementById("root"));
-reportWebVitals();
+  })
+  .catch(console.error);
