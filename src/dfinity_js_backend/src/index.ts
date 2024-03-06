@@ -460,22 +460,56 @@ export default Canister({
     Result(Types.Driver, Types.Message),
     (payload) => {
       // Check if the payload is a valid object
-      if (typeof payload !== "object" || Object.keys(payload).length === 0) {
-        return Err({ NotFound: "invalid payload" });
-      }
+      // if (typeof payload !== "object" || Object.keys(payload).length === 0) {
+      //   return Err({ NotFound: "invalid payload" });
+      // }
       // Create an event with a unique id generated using UUID v4
       const driver = {
         id: uuidv4(),
         owner: ic.caller(),
         maintainanceRecords: [],
         trainings: [],
+        driverRating: 0n,
+        driverStatus: "active",
         ...payload,
       };
+      console.log("driver created", driver.owner.toText());
       // Insert the event into the eventsStorage
       driverStorage.insert(driver.id, driver);
       return Ok(driver);
     }
   ),
+
+  // function to get driver with the same owner as ic.caller()
+  getDriverByOwner: query([], Result(Types.Driver, Types.Message), () => {
+    const driverOpt = driverStorage
+      .values()
+      .find((driver) => driver.owner.toText() === ic.caller().toText());
+    if (!driverOpt) {
+      return Err({ NotFound: `driver with owner=${ic.caller()} not found` });
+    }
+    return Ok(driverOpt);
+  }),
+
+  // function to get driver with the same owner as ic.caller() using filter
+  getDriverByOwnerFilter: query([], Result(Types.Driver, Types.Message), () => {
+    console.log("caller", ic.caller());
+    console.log("caller str", ic.caller().toText());
+    const driverOpt = driverStorage.values().filter((driver) => {
+      console.log("driver.owner", driver.owner);
+      console.log("owner str", driver.owner.toText());
+      return driver.owner.toText() === ic.caller().toText();
+    });
+    console.log(driverOpt);
+    if (driverOpt.length === 0) {
+      return Err({ NotFound: `driver with owner=${ic.caller()} not found` });
+    }
+    return Ok(driverOpt[0]);
+  }),
+
+  getAddressFromPrincipal: query([Principal], text, (principal) => {
+    return hexAddressFromPrincipal(principal, 0);
+  }),
 
   // function to add trainings to driver
   addTraining: update(
@@ -511,6 +545,7 @@ export default Canister({
 
   //   get all drivers
   getAllDrivers: query([], Vec(Types.Driver), () => {
+    console.log("driverlist", driverStorage.values());
     return driverStorage.values();
   }),
 
@@ -604,6 +639,45 @@ export default Canister({
         return Err({ NotFound: `maintainance record with id=${id} not found` });
       }
       return Ok(maintainanceRecordOpt.Some);
+    }
+  ),
+
+  // get driver completed orders. they have status of "completed"
+  getDriverCompletedOrders: query(
+    [text],
+    Vec(Types.OrderDetails),
+    (driverId) => {
+      const orders = orderDetailsStorage.values();
+      return orders.filter(
+        (order) =>
+          order.driverId === driverId && order.orderStatus === "completed"
+      );
+    }
+  ),
+
+  // get driver maintenance records
+  getDriverMaintainanceRecords: query(
+    [text],
+    Vec(Types.MaintainanceRecord),
+    (driverId) => {
+      const driverOpt = driverStorage.get(driverId);
+      if ("None" in driverOpt) {
+        return Err({ NotFound: `driver with id=${driverId} not found` });
+      }
+
+      // get records with id in driver.maintainanceRecords
+      const driver = driverOpt.Some;
+      const records = driver.maintainanceRecords.map((record: text) => {
+        const recordOpt = maintainanceRecordStorage.get(record);
+        if ("None" in recordOpt) {
+          return Err({
+            NotFound: `maintainance record with id=${record} not found`,
+          });
+        }
+        return recordOpt.Some;
+      });
+
+      return records;
     }
   ),
 });

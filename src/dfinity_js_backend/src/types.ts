@@ -1,7 +1,7 @@
 import { text, Record, Variant, Vec, Principal, Opt, nat64, bool } from "azle";
 
 /**
- * This type represents a product that can be listed on a marketplace.
+ * This type represents a product that can be listed on a chainflow.
  * It contains basic properties that are needed to define a product.
  */
 export const ClientCompany = Record({
@@ -136,8 +136,6 @@ export const DriverPayload = Record({
   vehicleType: text, // This is the type of the vehicle the driver drives eg(SUV, Sedan, etc)
   vehicleRegNo: text,
   company: text, // This is the company the driver works for
-  driverRating: nat64, // This will be the average rating of the drivers
-  driverStatus: text, // This will be the status of the driver eg(Active, Inactive, etc)
 });
 
 export const SupplyCompanyPayload = Record({
