@@ -134,6 +134,16 @@ export async function getDriverCompletedOrders(driverId) {
   }
 }
 
+// getDriverActiveOrder;
+export async function getDriverActiveOrder(driverId) {
+  try {
+    return await window.canister.chainflow.getDriverActiveOrder(driverId);
+  } catch (err) {
+    console.log(err);
+    return {};
+  }
+}
+
 export async function getAllMaintainanceRecords() {
   try {
     return await window.canister.chainflow.getAllMaintainanceRecords();

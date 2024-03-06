@@ -642,6 +642,27 @@ export default Canister({
     }
   ),
 
+  // get driver orders. they have status of  not "completed"
+  getDriverActiveOrder: query(
+    [text],
+    Result(Types.OrderDetails, Types.Message),
+    (driverId) => {
+      const orders = orderDetailsStorage.values();
+      const orderslist = orders.filter(
+        (order) =>
+          order.driverId === driverId && order.orderStatus !== "completed"
+      );
+
+      if (orderslist.length === 0) {
+        return Err({
+          NotFound: `driver with id=${driverId} has no active orders`,
+        });
+      }
+
+      return Ok(orderslist[0]);
+    }
+  ),
+
   // get driver completed orders. they have status of "completed"
   getDriverCompletedOrders: query(
     [text],
@@ -667,16 +688,7 @@ export default Canister({
 
       // get records with id in driver.maintainanceRecords
       const driver = driverOpt.Some;
-      const records = driver.maintainanceRecords.map((record: text) => {
-        const recordOpt = maintainanceRecordStorage.get(record);
-        if ("None" in recordOpt) {
-          return Err({
-            NotFound: `maintainance record with id=${record} not found`,
-          });
-        }
-        return recordOpt.Some;
-      });
-
+      const records = driver.maintainanceRecords;
       return records;
     }
   ),
