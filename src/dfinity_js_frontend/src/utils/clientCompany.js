@@ -29,10 +29,13 @@ export async function getClientCompany(id) {
   }
 }
 
-export async function updateClientCompany(id,clientCompany) {
+export async function updateClientCompany(id, clientCompany) {
   try {
-    return await window.canister.chainflow.updateClientCompany(id,clientCompany);
-  }  catch (err) {
+    return await window.canister.chainflow.updateClientCompany(
+      id,
+      clientCompany
+    );
+  } catch (err) {
     if (err.name === "AgentHTTPResponseError") {
       const authClient = window.auth.client;
       await authClient.logout();
@@ -55,7 +58,10 @@ export async function searchClientCompany(query) {
 
 export async function addAffiliatedCompany(clientId, companyName) {
   try {
-    return await window.canister.chainflow.addAffiliatedCompany(clientId, companyName);
+    return await window.canister.chainflow.addAffiliatedCompany(
+      clientId,
+      companyName
+    );
   } catch (err) {
     if (err.name === "AgentHTTPResponseError") {
       const authClient = window.auth.client;
@@ -63,7 +69,6 @@ export async function addAffiliatedCompany(clientId, companyName) {
     }
     return {};
   }
-
 }
 
 export async function addProduct(clientId, productName) {
@@ -78,19 +83,11 @@ export async function addProduct(clientId, productName) {
   }
 }
 
-
-
-
-
-
-
-
-
 // export async function buyProduct(product) {
-//   const marketplaceCanister = window.canister.marketplace;
-//   const orderResponse = await marketplaceCanister.createOrder(product.id);
+//   const chainflowCanister = window.canister.chainflow;
+//   const orderResponse = await chainflowCanister.createOrder(product.id);
 //   const sellerPrincipal = Principal.from(orderResponse.Ok.seller);
-//   const sellerAddress = await marketplaceCanister.getAddressFromPrincipal(sellerPrincipal);
+//   const sellerAddress = await chainflowCanister.getAddressFromPrincipal(sellerPrincipal);
 //   const block = await transferICP(sellerAddress, orderResponse.Ok.price, orderResponse.Ok.memo);
-//   await marketplaceCanister.completePurchase(sellerPrincipal, product.id, orderResponse.Ok.price, block, orderResponse.Ok.memo);
+//   await chainflowCanister.completePurchase(sellerPrincipal, product.id, orderResponse.Ok.price, block, orderResponse.Ok.memo);
 // }

@@ -2,33 +2,31 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
 
-const MaintainanceRecord = ({save}) => {
+const MaintainanceRecord = ({ save }) => {
+  const [vehicleRegNo, setVehicleRegNo] = useState("");
+  const [date, setDate] = useState("");
+  const [description, setDescription] = useState("");
+  const [cost, setCost] = useState("");
+  const [mechanic, setMechanic] = useState("");
+  const [mechanicContact, setMechanicContact] = useState("");
+  const [mechanicAddress, setMechanicAddress] = useState("");
+  const [mechanicEmail, setMechanicEmail] = useState("");
+  const [mechanicPhone, setMechanicPhone] = useState("");
 
+  const [show, setShow] = useState(false);
 
-    const [vehicleRegNo, setVehicleRegNo] = useState("");
-    const [date, setDate] = useState("");
-    const [description, setDescription] = useState("");
-    const [cost, setCost] = useState("");
-    const [mechanic, setMechanic] = useState("");
-    const [mechanicContact, setMechanicContact] = useState("");
-    const [mechanicAddress, setMechanicAddress] = useState("");
-    const [mechanicEmail, setMechanicEmail] = useState("");
-    const [mechanicPhone, setMechanicPhone] = useState("");
-
-    const [show, setShow] = useState(false);
-
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   return (
     <>
       <Button
         onClick={handleShow}
-        variant="dark"
-        className="rounded-pill px-0"
-        style={{ width: "38px" }}
+        color="blue_gray_900_02"
+        size="8xl"
+        className="ml-[9px] min-w-[264px] rounded-[20px]"
       >
-        <i class="bi bi-plus"></i>
+        Create MaintainanceRecord
       </Button>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
@@ -49,11 +47,7 @@ const MaintainanceRecord = ({save}) => {
                 placeholder="Enter vehicle reg no"
               />
             </FloatingLabel>
-            <FloatingLabel
-              controlId="inputDate"
-              label="Date"
-              className="mb-3"
-            >
+            <FloatingLabel controlId="inputDate" label="Date" className="mb-3">
               <Form.Control
                 type="date"
                 placeholder="Date"
@@ -75,11 +69,7 @@ const MaintainanceRecord = ({save}) => {
                 }}
               />
             </FloatingLabel>
-            <FloatingLabel
-              controlId="inputCost"
-              label="Cost"
-              className="mb-3"
-            >
+            <FloatingLabel controlId="inputCost" label="Cost" className="mb-3">
               <Form.Control
                 type="number"
                 placeholder="Cost"
@@ -114,75 +104,78 @@ const MaintainanceRecord = ({save}) => {
                 }}
               />
             </FloatingLabel>
-            <Floating
-                controlId="inputMechanicAddress"
-                label="Mechanic Address"
-                className="mb-3"
-            >
-                <Form.Control
-                    type="text"
-                    placeholder="Mechanic Address"
-                    onChange={(e) => {
-                    setMechanicAddress(e.target.value);
-                    }}
-                />
-            </Floating>
             <FloatingLabel
-                controlId="inputMechanicEmail"
-                label="Mechanic Email"
-                className="mb-3"
+              controlId="inputMechanicAddress"
+              label="Mechanic Address"
+              className="mb-3"
             >
-                <Form.Control
-                    type="email"
-                    placeholder="Mechanic Email"
-                    onChange={(e) => {
-                    setMechanicEmail(e.target.value);
-                    }}
-                />
+              <Form.Control
+                type="text"
+                placeholder="Mechanic Address"
+                onChange={(e) => {
+                  setMechanicAddress(e.target.value);
+                }}
+              />
             </FloatingLabel>
             <FloatingLabel
-                controlId="inputMechanicPhone"
-                label="Mechanic Phone"
-                className="mb-3"
+              controlId="inputMechanicEmail"
+              label="Mechanic Email"
+              className="mb-3"
             >
-                <Form.Control
-                    type="text"
-                    placeholder="Mechanic Phone"
-                    onChange={(e) => {
-                    setMechanicPhone(e.target.value);
-                    }}
-                />
+              <Form.Control
+                type="email"
+                placeholder="Mechanic Email"
+                onChange={(e) => {
+                  setMechanicEmail(e.target.value);
+                }}
+              />
             </FloatingLabel>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
-                <Button
-                    variant="dark"
-                    onClick={() => {
-                        save({
-                            vehicleRegNo,
-                            date,
-                            description,
-                            cost,
-                            mechanic,
-                            mechanicContact,
-                            mechanicAddress,
-                            mechanicEmail,
-                            mechanicPhone,
-                        });
-                        handleClose();
-                    }}
-                >
-                    Save
-                </Button>
-            </Modal.Footer>
+            <FloatingLabel
+              controlId="inputMechanicPhone"
+              label="Mechanic Phone"
+              className="mb-3"
+            >
+              <Form.Control
+                type="text"
+                placeholder="Mechanic Phone"
+                onChange={(e) => {
+                  setMechanicPhone(e.target.value);
+                }}
+              />
+            </FloatingLabel>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+            <Button
+              variant="dark"
+              onClick={() => {
+                save({
+                  vehicleRegNo,
+                  date,
+                  description,
+                  cost,
+                  mechanic,
+                  mechanicContact,
+                  mechanicAddress,
+                  mechanicEmail,
+                  mechanicPhone,
+                });
+                handleClose();
+              }}
+            >
+              Save
+            </Button>
+          </Modal.Footer>
         </Form>
-        </Modal>
+      </Modal>
     </>
+  );
+};
 
-  )
-}
+MaintainanceRecord.propTypes = {
+  save: PropTypes.func.isRequired,
+};
 
-export default MaintainanceRecord
+export default MaintainanceRecord;
