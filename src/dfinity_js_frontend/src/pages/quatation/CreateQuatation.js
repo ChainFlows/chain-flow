@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
+import { Button as BButton, Modal, Form, FloatingLabel } from "react-bootstrap";
+import { Button } from "../../components/utils";
 
-const CreateQuotation = ({ save }) => {
+const CreateQuotation = ({ supplierId, order, save }) => {
   const [quotationTitle, setQuotationTitle] = useState("");
-  const [supplierId, setSupplierId] = useState("");
-  const [orderId, setOrderId] = useState("");
   const [serviceDescription, setServiceDescription] = useState("");
   const [shippingCost, setShippingCost] = useState("");
   const [show, setShow] = useState(false);
@@ -16,18 +15,15 @@ const CreateQuotation = ({ save }) => {
     <>
       <Button
         onClick={handleShow}
-        variant="dark"
-        className="rounded-pill px-0"
-        style={{ width: "38px" }}
+        color="blue_gray_900_02"
+        size="11xl"
+        className="min-w-[115px] items-center gap-2 flex rounded-[28px]"
       >
-        <i
-          className="bi bi-plus
-            "className=
-        ></i>
+        <i className="bi bi-plus"></i> Add Quotation
       </Button>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
-          <Modal.Title>New Quotation</Modal.Title>
+          <Modal.Title>New Quotation for {order.orderName}</Modal.Title>
         </Modal.Header>
         <Form>
           <Modal.Body>
@@ -42,32 +38,6 @@ const CreateQuotation = ({ save }) => {
                   setQuotationTitle(e.target.value);
                 }}
                 placeholder="Enter title of quotation"
-              />
-            </FloatingLabel>
-            <FloatingLabel
-              controlId="inputSupplierId"
-              label="Supplier ID"
-              className="mb-3"
-            >
-              <Form.Control
-                type="text"
-                placeholder="Supplier ID"
-                onChange={(e) => {
-                  setSupplierId(e.target.value);
-                }}
-              />
-            </FloatingLabel>
-            <FloatingLabel
-              controlId="inputOrderId"
-              label="Order ID"
-              className="mb-3"
-            >
-              <Form.Control
-                type="text"
-                placeholder="Order ID"
-                onChange={(e) => {
-                  setOrderId(e.target.value);
-                }}
               />
             </FloatingLabel>
             <FloatingLabel
@@ -98,16 +68,16 @@ const CreateQuotation = ({ save }) => {
             </FloatingLabel>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose}>
+            <BButton variant="secondary" onClick={handleClose}>
               Close
-            </Button>
-            <Button
+            </BButton>
+            <BButton
               variant="dark"
               onClick={() => {
                 save({
                   quotationTitle,
                   supplierId,
-                  orderId,
+                  orderId: order.id,
                   serviceDescription,
                   shippingCost,
                 });
@@ -115,7 +85,7 @@ const CreateQuotation = ({ save }) => {
               }}
             >
               Save
-            </Button>
+            </BButton>
           </Modal.Footer>
         </Form>
       </Modal>

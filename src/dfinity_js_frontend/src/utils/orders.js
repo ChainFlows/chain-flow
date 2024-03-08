@@ -37,6 +37,19 @@ export async function createOrderDetails(orderDetails) {
       return {};
     }
   }
+
+// updateOrderStatus
+export async function updateOrderStatus(id, status) {
+    try {
+      return await window.canister.chainflow.updateOrderStatus(id, status);
+    } catch (err) {
+      if (err.name === "AgentHTTPResponseError") {
+        const authClient = window.auth.client;
+        await authClient.logout();
+      }
+      return {};
+    }
+  }
   
   export async function addItem(orderId, Item) {
     try {
@@ -55,6 +68,20 @@ export async function createOrderDetails(orderDetails) {
   export async function assignDriver(orderId, driverId) {
     try {
       return await window.canister.chainflow.assignDriver(orderId, driverId);
+    } catch (err) {
+      if (err.name === "AgentHTTPResponseError") {
+        const authClient = window.auth.client;
+        await authClient.logout();
+      }
+      return {};
+    }
+  
+  }
+
+// assignSupplier
+export async function assignSupplier(orderId, supplierId) {
+    try {
+      return await window.canister.chainflow.assignSupplier(orderId, supplierId);
     } catch (err) {
       if (err.name === "AgentHTTPResponseError") {
         const authClient = window.auth.client;

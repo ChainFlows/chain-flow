@@ -39,10 +39,23 @@ export async function getSupplyCompanyByOwner() {
   }
 }
 
-export async function getSupplyCompanyActiveOrders(supplyCompanyId) {
+// getNewOrders
+export async function getNewOrders() {
+  try {
+    return await window.canister.chainflow.getNewOrders();
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
+}
+
+export async function getSupplyCompanyActiveOrders(CompanyId) {
   try {
     return await window.canister.chainflow.getSupplyCompanyActiveOrders(
-      supplyCompanyId
+      CompanyId
     );
   } catch (err) {
     if (err.name === "AgentHTTPResponseError") {
@@ -53,10 +66,10 @@ export async function getSupplyCompanyActiveOrders(supplyCompanyId) {
   }
 }
 
-export async function getSupplyCompanyCompletedOrders(supplyCompanyId) {
+export async function getSupplyCompanyCompletedOrders(CompanyId) {
   try {
     return await window.canister.chainflow.getSupplyCompanyCompletedOrders(
-      supplyCompanyId
+      CompanyId
     );
   } catch (err) {
     if (err.name === "AgentHTTPResponseError") {
@@ -67,11 +80,9 @@ export async function getSupplyCompanyCompletedOrders(supplyCompanyId) {
   }
 }
 
-export async function getSupplyCompanyNewOrders(supplyCompanyId) {
+export async function getSupplyCompanyNewOrders(CompanyId) {
   try {
-    return await window.canister.chainflow.getSupplyCompanyNewOrders(
-      supplyCompanyId
-    );
+    return await window.canister.chainflow.getSupplyCompanyNewOrders(CompanyId);
   } catch (err) {
     if (err.name === "AgentHTTPResponseError") {
       const authClient = window.auth.client;

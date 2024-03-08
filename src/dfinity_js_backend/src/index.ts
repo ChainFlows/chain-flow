@@ -317,7 +317,7 @@ export default Canister({
   // get supply company orders. they have status of  not "completed"
   getSupplyCompanyActiveOrders: query(
     [text],
-    Result(Types.OrderDetails, Types.Message),
+    Vec(Types.OrderDetails),
     (companyId) => {
       const orders = orderDetailsStorage.values();
       const orderslist = orders.filter(
@@ -325,13 +325,7 @@ export default Canister({
           order.supplierId === companyId && order.orderStatus !== "completed"
       );
 
-      if (orderslist.length === 0) {
-        return Err({
-          NotFound: `supply company with id=${companyId} has no active orders`,
-        });
-      }
-
-      return Ok(orderslist[0]);
+      return orderslist;
     }
   ),
 
@@ -339,14 +333,19 @@ export default Canister({
   getSupplyCompanyNewOrders: query(
     [text],
     Vec(Types.OrderDetails),
-    (supplierId) => {
+    (companyId) => {
       const orders = orderDetailsStorage.values();
       return orders.filter(
         (order) =>
-          order.supplierId === supplierId && order.driverId.length === 0
+          order.supplierId === companyId && order.driverId.None === null
       );
     }
   ),
+  // function to get new order listings
+  getNewOrders: query([], Vec(Types.OrderDetails), () => {
+    const orders = orderDetailsStorage.values();
+    return orders.filter((order) => order.supplierId.None === null);
+  }),
 
   //   search for supply company by name or business type
   searchSupplyCompany: query([text], Vec(Types.SupplyCompany), (search) => {
@@ -493,6 +492,22 @@ export default Canister({
     }
   ),
 
+  // update order status
+  updateOrderStatus: update(
+    [text, text],
+    Result(Types.OrderDetails, Types.Message),
+    (orderId, status) => {
+      const orderDetailsOpt = orderDetailsStorage.get(orderId);
+      if ("None" in orderDetailsOpt) {
+        return Err({ NotFound: `order details with id=${orderId} not found` });
+      }
+      const orderDetails = orderDetailsOpt.Some;
+      orderDetails.orderStatus = status;
+      orderDetailsStorage.insert(orderDetails.id, orderDetails);
+      return Ok(orderDetails);
+    }
+  ),
+
   // mark order as delivered and develop driver ratings
   markOrderAsDelivered: update(
     [Types.CompletionPayload],
@@ -557,6 +572,8 @@ export default Canister({
         ...payload,
       };
 
+      console.log(quotation);
+
       // Insert the event into the eventsStorage
       quotationStorage.insert(quotation.id, quotation);
       return Ok(quotation);
@@ -588,6 +605,12 @@ export default Canister({
       );
     }
   ),
+
+  // get all order quotations using order id
+  getOrderQuotations: query([text], Vec(Types.Quotation), (orderId) => {
+    const quotations = quotationStorage.values();
+    return quotations.filter((quotation) => quotation.orderId === orderId);
+  }),
 
   //  update quotation status
   updateQuotationStatus: update(
@@ -691,7 +714,6 @@ export default Canister({
 
   //   get all drivers
   getAllDrivers: query([], Vec(Types.Driver), () => {
-    console.log("driverlist", driverStorage.values());
     return driverStorage.values();
   }),
 
