@@ -2,23 +2,22 @@ import React, { useEffect, useState, useCallback } from "react";
 import { login } from "../../utils/auth";
 import { Notification } from "../../components/utils/Notifications";
 import Login from "./Login";
-import DriverDashboard from "./DriverDashboard";
-
-import { getDriverByOwner } from "../../utils/driver";
+import { getSupplyCompanyByOwner } from "../../utils/supplyCompany";
 import { Loader } from "../../components/utils";
-import ActivateDriverAccountVerifyBusinessPage from "./ActivateDriverAccountVerifyBusiness";
+import ActivateSupplierAccount from "./ActivateSupplierAccount";
+import CompanyOverviewPage from "./CompanyOverview";
 
-const Driver = () => {
-  const [driver, setDriver] = useState({});
+const Supplier = () => {
+  const [supplier, setSupplier] = useState({});
   const [loading, setLoading] = useState(false);
 
   const isAuthenticated = window.auth.isAuthenticated;
 
-  const fetchDriver = useCallback(async () => {
+  const fetchSupplier = useCallback(async () => {
     try {
       setLoading(true);
-      setDriver(
-        await getDriverByOwner().then(async (res) => {
+      setSupplier(
+        await getSupplyCompanyByOwner().then(async (res) => {
           console.log(res);
           return res.Ok;
         })
@@ -30,12 +29,10 @@ const Driver = () => {
     }
   });
 
-
-
-  console.log("driver", driver);
+  console.log("supplier", supplier);
 
   useEffect(() => {
-    fetchDriver();
+    fetchSupplier();
   }, []);
 
   return (
@@ -43,14 +40,12 @@ const Driver = () => {
       <Notification />
       {isAuthenticated ? (
         !loading ? (
-          driver?.fullName ? (
+          supplier?.name ? (
             <main>
-              <DriverDashboard driver={driver} />
+              <CompanyOverviewPage supplier={supplier} />
             </main>
           ) : (
-            <ActivateDriverAccountVerifyBusinessPage
-              fetchDriver={fetchDriver}
-            />
+            <ActivateSupplierAccount fetchSupplier={fetchSupplier} />
           )
         ) : (
           <Loader />
@@ -62,4 +57,4 @@ const Driver = () => {
   );
 };
 
-export default Driver;
+export default Supplier;

@@ -48,6 +48,19 @@ export async function sortQuotationsByCompanyName(companyId) {
   }
 }
 
+// getOrderQuotations
+export async function getOrderQuotations(orderId) {
+  try {
+    return await window.canister.chainflow.getOrderQuotations(orderId);
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
+}
+
 export async function updateQuotationStatus(quotationId, status) {
   try {
     return await window.canister.chainflow.updateQuotationStatus(

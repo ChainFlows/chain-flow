@@ -14,13 +14,14 @@ import {
 import * as Images from "../../../assets/images";
 import Wallet from "../../../components/Wallet";
 import {
-  getClientCompanyCurrentOrders,
+  getClientCompanyActiveOrders,
   getClientCompanyCompletedOrders,
   getClientCompanyNewOrders,
 } from "../../../utils/clientCompany";
 import { toast } from "react-toastify";
-import { createOrderDetails } from "../../../utils/orders";
+import { assignSupplier, createOrderDetails } from "../../../utils/orders";
 import AddOrder from "../../order/AddOrder";
+import ViewBids from "../Bids";
 
 const dropDownOptions = [
   { label: "Option1", value: "option1" },
@@ -32,10 +33,9 @@ export default function CompanyOverviewPage({ client }) {
   const [sliderState, setSliderState] = useState(0);
   const sliderRef = React.useRef(null);
   const [searchBarValue32, setSearchBarValue32] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [completedOrders, setCompletedOrders] = useState([]);
-  const [currentOrders, setCurrentOrders] = useState({});
+  const [currentOrders, setCurrentOrders] = useState([]);
   const [newOrders, setNewOrders] = useState([]);
   const [tab, setTab] = useState("new");
 
@@ -58,6 +58,20 @@ export default function CompanyOverviewPage({ client }) {
       toast(<NotificationError text="Failed to create a order." />);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // assign supplier to bid
+  const assignSupplierBid = async (orderId, supplierId) => {
+    try {
+      setLoading(true);
+      await assignSupplier(orderId, supplierId);
+      toast(<NotificationSuccess text="Supplier assigned successfully." />);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      toast(<NotificationError text="Failed to assign supplier." />);
     }
   };
 
@@ -85,11 +99,11 @@ export default function CompanyOverviewPage({ client }) {
     }
   });
 
-  // get getClientCompanyCurrentOrders
+  // get getClientCompanyActiveOrders
   const fetchCurrentOrders = useCallback(async () => {
     try {
       setLoading(true);
-      setCurrentOrders(await getClientCompanyCurrentOrders(client.id));
+      setCurrentOrders(await getClientCompanyActiveOrders(client.id));
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -314,13 +328,15 @@ export default function CompanyOverviewPage({ client }) {
                                                 {order.orderWeight}
                                               </Text>
                                             </div>
-                                            <Text
-                                              size="lg"
-                                              as="p"
-                                              className="mt-[10px]"
-                                            >
-                                              {order.deliveryAddress}
-                                            </Text>
+                                            <div className="mt-2 flex justify-between items-center">
+                                              <Text size="2xl" as="p">
+                                                {order.deliveryAddress}
+                                              </Text>
+                                              <ViewBids
+                                                order={order}
+                                                save={assignSupplierBid}
+                                              />
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
@@ -328,7 +344,7 @@ export default function CompanyOverviewPage({ client }) {
                                   </>
                                 ) : tab === "maintainance" ? (
                                   <>
-                                    {[1, 2, 3, 4].map((_, index) => (
+                                    {currentOrders.map((order, index) => (
                                       <div
                                         key={index}
                                         className="flex flex-row justify-center w-full p-2 bg-white-A700_01 shadow-xs rounded-[12px]"
@@ -346,37 +362,39 @@ export default function CompanyOverviewPage({ client }) {
                                                 as="p"
                                                 className="mb-px "
                                               >
-                                                {"vehicleRegNo"}
+                                                {order.orderName}
                                               </Text>
                                               <Text
                                                 size="2xl"
                                                 as="p"
                                                 className="mb-px "
                                               >
-                                                {"date"}
+                                                {order.priority}
                                               </Text>
                                               <Text
                                                 size="2xl"
                                                 as="p"
                                                 className="mb-px "
                                               >
-                                                {"mechanic"}
+                                                {order.category}
                                               </Text>
                                               <Text
                                                 size="2xl"
                                                 as="p"
                                                 className="mb-px "
                                               >
-                                                {"cost"}
+                                                {order.orderWeight}
                                               </Text>
                                             </div>
-                                            <Text
-                                              size="lg"
-                                              as="p"
-                                              className="mt-[10px]"
-                                            >
-                                              {"description"}
-                                            </Text>
+                                            <div className="mt-2 flex justify-between items-center">
+                                              <Text size="2xl" as="p">
+                                                {order.deliveryAddress}
+                                              </Text>
+                                              <ViewBids
+                                                order={order}
+                                                save={assignSupplierBid}
+                                              />
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
@@ -384,7 +402,7 @@ export default function CompanyOverviewPage({ client }) {
                                   </>
                                 ) : (
                                   <>
-                                    {[1, 2, 3, 4].map((_, index) => (
+                                    {completedOrders.map((order, index) => (
                                       <div
                                         key={index}
                                         className="flex flex-row justify-center w-full p-2 bg-white-A700_01 shadow-xs rounded-[12px]"
@@ -402,37 +420,39 @@ export default function CompanyOverviewPage({ client }) {
                                                 as="p"
                                                 className="mb-px "
                                               >
-                                                {"vehicleRegNo"}
+                                                {order.orderName}
                                               </Text>
                                               <Text
                                                 size="2xl"
                                                 as="p"
                                                 className="mb-px "
                                               >
-                                                {"date"}
+                                                {order.priority}
                                               </Text>
                                               <Text
                                                 size="2xl"
                                                 as="p"
                                                 className="mb-px "
                                               >
-                                                {"mechanic"}
+                                                {order.category}
                                               </Text>
                                               <Text
                                                 size="2xl"
                                                 as="p"
                                                 className="mb-px "
                                               >
-                                                {"cost"}
+                                                {order.orderWeight}
                                               </Text>
                                             </div>
-                                            <Text
-                                              size="lg"
-                                              as="p"
-                                              className="mt-[10px]"
-                                            >
-                                              {"description"}
-                                            </Text>
+                                            <div className="mt-2 flex justify-between items-center">
+                                              <Text size="2xl" as="p">
+                                                {order.deliveryAddress}
+                                              </Text>
+                                              <ViewBids
+                                                order={order}
+                                                save={assignSupplierBid}
+                                              />
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
@@ -445,6 +465,59 @@ export default function CompanyOverviewPage({ client }) {
                         </TabPanel>
                       ))}
                     </Tabs>
+                    <div className="flex flex-row justify-start w-full p-7 bg-blue_gray-900_0c shadow-xs rounded-[19px]">
+                      <div className="flex flex-col items-start justify-start w-[95%] mt-[9px] ml-[3px]">
+                        <Text size="3xl" as="p" className="ml-px">
+                          Expand Your Customer Base
+                        </Text>
+                        <Text as="p" className="mt-[31px] ml-px">
+                          Lorem ipsum dolor sit amet, consectetur adipiscing
+                          elit. Sed faucibus, elit sed
+                        </Text>
+                        <Text as="p" className="mt-2.5 ml-px">
+                          pellentesque bibendum, est ligula feugiat libero, eu
+                          convallis justo est et elit. Nulla
+                        </Text>
+                        <div className="flex flex-row justify-start mt-[30px]">
+                          <Button
+                            size="6xl"
+                            leftIcon={
+                              <Img
+                                src={Images.img_logo_facebook_1}
+                                alt="Logo facebook 1"
+                              />
+                            }
+                            className="gap-3 !text-blue_gray-900_02 border-gray-600_01 border border-solid min-w-[171px] rounded-[19px]"
+                          >
+                            Facebook
+                          </Button>
+                          <Button
+                            size="6xl"
+                            leftIcon={
+                              <Img
+                                src={Images.img_logo_twitter_1}
+                                alt="Logo twitter 1"
+                              />
+                            }
+                            className="ml-[50px] gap-3 !text-blue_gray-900_02 border-gray-600_01 border border-solid min-w-[180px] rounded-[19px]"
+                          >
+                            Twitter
+                          </Button>
+                          <Button
+                            size="6xl"
+                            leftIcon={
+                              <Img
+                                src={Images.img_logo_linkedin_1}
+                                alt="Logo linkedin 1"
+                              />
+                            }
+                            className="ml-[39px] gap-[13px] !text-blue_gray-900_02 border-gray-600_01 border border-solid min-w-[174px] rounded-[19px]"
+                          >
+                            Linkedin
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex flex-col items-center justify-start w-[32%] gap-[30px]">
                     <div className="justify-center w-full gap-[15px] grid-cols-2 grid">
@@ -676,63 +749,6 @@ export default function CompanyOverviewPage({ client }) {
                             View All
                           </Text>
                         </a>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start justify-start w-full gap-[25px] p-[23px] bg-blue_gray-900_0c shadow-xs rounded-[19px]">
-                      <Text size="3xl" as="p" className="mt-[15px] ml-[9px]">
-                        Product Ads
-                      </Text>
-                      <div className="flex flex-col items-center justify-start w-full mb-[97px] gap-3">
-                        <Text as="p">
-                          Need some ideas for your next product?
-                        </Text>
-                        <div className="flex flex-col w-full gap-[5px]">
-                          <div className="flex flex-row justify-start w-full p-2 bg-gray-400_30 shadow-xs rounded-[12px]">
-                            <div className="flex flex-row justify-start items-center w-[95%] gap-3 my-[7px]">
-                              <Img
-                                src={Images.img_image_194}
-                                alt="product_name"
-                                className="h-[52px] w-[52px] rounded-[50%]"
-                              />
-                              <div className="flex flex-col items-start justify-start w-[76%] gap-[9px]">
-                                <Text size="2xl" as="p">
-                                  Product Name
-                                </Text>
-                                <Text as="p">Product details/description</Text>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-row justify-start w-full p-2 bg-gray-400_30 shadow-xs rounded-[12px]">
-                            <div className="flex flex-row justify-start items-center w-[95%] gap-3 my-[7px]">
-                              <Img
-                                src={Images.img_image_194}
-                                alt="image194_one"
-                                className="h-[52px] w-[52px] rounded-[50%]"
-                              />
-                              <div className="flex flex-col items-start justify-start w-[76%] gap-[9px]">
-                                <Text size="2xl" as="p">
-                                  Product Name
-                                </Text>
-                                <Text as="p">Product details/description</Text>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-row justify-start w-full p-2 bg-gray-400_30 shadow-xs rounded-[12px]">
-                            <div className="flex flex-row justify-start items-center w-[95%] gap-3 my-[7px]">
-                              <Img
-                                src={Images.img_image_194}
-                                alt="image194_one"
-                                className="h-[52px] w-[52px] rounded-[50%]"
-                              />
-                              <div className="flex flex-col items-start justify-start w-[76%] gap-[9px]">
-                                <Text size="2xl" as="p">
-                                  Product Name
-                                </Text>
-                                <Text as="p">Product details/description</Text>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
