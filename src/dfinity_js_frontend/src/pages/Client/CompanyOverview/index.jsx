@@ -66,6 +66,8 @@ export default function CompanyOverviewPage({ client }) {
     try {
       setLoading(true);
       await assignSupplier(orderId, supplierId);
+      fetchNewOrders();
+      fetchCurrentOrders();
       toast(<NotificationSuccess text="Supplier assigned successfully." />);
       setLoading(false);
     } catch (error) {
@@ -141,11 +143,18 @@ export default function CompanyOverviewPage({ client }) {
                 <div className="flex flex-row justify-between items-center w-full">
                   <div className="flex flex-row justify-end items-center w-full gap-[21px]">
                     <AddOrder save={saveOrder} />
+                    <Button
+                      color="blue_gray_900_02"
+                      size="12xl"
+                      className="min-w-[115px] rounded-[28px]"
+                    >
+                      Update Profile
+                    </Button>
                     <Wallet />
                   </div>
                 </div>
                 <Text size="12xl" as="p" className="mt-6 ml-[3px]">
-                  Company A/Supplier
+                  Company {client.name} Overview
                 </Text>
                 <div className="flex flex-row justify-start items-start w-full mt-[45px] gap-[29px]">
                   <div className="flex flex-col items-center justify-start w-[66%] gap-7">
