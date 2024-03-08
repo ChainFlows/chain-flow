@@ -1,7 +1,9 @@
 export async function createQuotation(quotationPayload) {
   try {
+    console.log("utils", quotationPayload);
     return await window.canister.chainflow.createQuotation(quotationPayload);
   } catch (err) {
+    console.log(err);
     if (err.name === "AgentHTTPResponseError") {
       const authClient = window.auth.client;
       await authClient.logout();

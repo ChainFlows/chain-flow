@@ -167,23 +167,18 @@ export default Canister({
   // get client company orders. they have status of  not "completed"
   getClientCompanyActiveOrders: query(
     [text],
-    Result(Types.OrderDetails, Types.Message),
+    Vec(Types.OrderDetails),
     (companyId) => {
       const orders = orderDetailsStorage.values();
       const orderslist = orders.filter(
         (order) =>
           order.companyId === companyId &&
-          order.supplierId &&
+          order.supplierId.Some &&
           order.orderStatus !== "completed"
       );
+      console.log("order", orders);
 
-      if (orderslist.length === 0) {
-        return Err({
-          NotFound: `client company with id=${companyId} has no active orders`,
-        });
-      }
-
-      return Ok(orderslist[0]);
+      return orderslist;
     }
   ),
 
@@ -309,7 +304,8 @@ export default Canister({
       const orders = orderDetailsStorage.values();
       return orders.filter(
         (order) =>
-          order.supplierId === companyId && order.orderStatus === "completed"
+          order.supplierId.Some === companyId &&
+          order.orderStatus === "completed"
       );
     }
   ),
@@ -322,7 +318,9 @@ export default Canister({
       const orders = orderDetailsStorage.values();
       const orderslist = orders.filter(
         (order) =>
-          order.supplierId === companyId && order.orderStatus !== "completed"
+          order.supplierId.Some === companyId &&
+          order.driverId.Some &&
+          order.orderStatus !== "completed"
       );
 
       return orderslist;
@@ -335,9 +333,10 @@ export default Canister({
     Vec(Types.OrderDetails),
     (companyId) => {
       const orders = orderDetailsStorage.values();
+      console.log("new orders", orders);
       return orders.filter(
         (order) =>
-          order.supplierId === companyId && order.driverId.None === null
+          order.supplierId.Some === companyId && order.driverId.None === null
       );
     }
   ),

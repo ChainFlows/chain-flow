@@ -49,9 +49,12 @@ export default function CompanyOverviewPage({ supplier }) {
     try {
       setLoading(true);
 
+      data.shippingCost = parseInt(data.shippingCost, 10);
+
       await createQuotation(data).then((resp) => {
         console.log(resp);
-        fetchNewOrders();
+        console.log(data);
+        fetchNewOrderListings();
         toast(<NotificationSuccess text="Quotation added successfully." />);
       });
     } catch (error) {
@@ -93,7 +96,8 @@ export default function CompanyOverviewPage({ supplier }) {
   const fetchNewOrders = useCallback(async () => {
     try {
       setLoading(true);
-      const orders = await getSupplyCompanyNewOrders();
+      const orders = await getSupplyCompanyNewOrders(id);
+      console.log("new orders",orders)
       setNewOrders(orders);
       setLoading(false);
     } catch (error) {
@@ -158,16 +162,16 @@ export default function CompanyOverviewPage({ supplier }) {
                   <div className="flex flex-row justify-end items-center w-full gap-[21px]">
                     <Button
                       color="blue_gray_900_02"
-                      size="16xl"
+                      size="12xl"
                       className="min-w-[115px] rounded-[28px]"
                     >
-                      Update Acc
+                      Update Profile
                     </Button>
                     <Wallet />
                   </div>
                 </div>
                 <Text size="12xl" as="p" className="mt-6 ml-[3px]">
-                  Company A/Supplier
+                  Company {supplier.name} Overview
                 </Text>
                 <div className="flex flex-row justify-start items-start w-full mt-[45px] gap-[29px]">
                   <div className="flex flex-col items-center justify-start w-[66%] gap-7">
@@ -548,9 +552,9 @@ export default function CompanyOverviewPage({ supplier }) {
                                               {order.deliveryAddress}
                                             </Text>
                                             <CreateQuotation
+                                              supplierId={id}
                                               order={order}
                                               save={saveQuotation}
-                                              supplierId={id}
                                             />
                                           </div>
                                         </div>

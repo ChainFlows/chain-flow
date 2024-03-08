@@ -59,7 +59,7 @@ const CreateQuotation = ({ supplierId, order, save }) => {
               className="mb-3"
             >
               <Form.Control
-                type="text"
+                type="number"
                 placeholder="Shipping Cost"
                 onChange={(e) => {
                   setShippingCost(e.target.value);

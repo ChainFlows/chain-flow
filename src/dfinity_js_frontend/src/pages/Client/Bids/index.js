@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { Button as BButton, Modal, Form, FloatingLabel } from "react-bootstrap";
+import { Button as BButton, Modal, Form } from "react-bootstrap";
 import { Button, Loader } from "../../../components/utils";
 import { getOrderQuotations } from "../../../utils/quatation";
 
-const ViewBids = ({ order, save }) => {
+function ViewBids({ order, save }) {
   const [show, setShow] = useState(false);
   const [bids, setBids] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,11 +24,11 @@ const ViewBids = ({ order, save }) => {
       console.log(error);
       setLoading(false);
     }
-  });
+  }, [id]);
 
   useEffect(() => {
     fetchBids();
-  }, []);
+  }, [fetchBids]);
 
   console.log(bids, "bids");
 
@@ -46,47 +46,41 @@ const ViewBids = ({ order, save }) => {
           >
             Bids
           </Button>
-          <Modal show={show} onHide={handleClose} centered>
+          <Modal
+            size="lg"
+            className="w-[50%]"
+            show={show}
+            onHide={handleClose}
+            centered
+          >
             <Modal.Header closeButton>
               <Modal.Title>Bids for {orderName}</Modal.Title>
             </Modal.Header>
             <Form>
               <Modal.Body>
-                {bids.map((bid, index) => {
-                  return (
-                    <div className="flex flex-col w-[84%]">
-                      <div className="flex flex-row justify-between items-center">
-                        <Text size="3xl" as="p" className="mb-px ">
-                          {bid.quotationTitle}
-                        </Text>
-                        <Text size="2xl" as="p" className="mb-px ">
-                          {bid.supplierName}
-                        </Text>
-                        <Text size="2xl" as="p" className="mb-px ">
-                          {bid.supplierEmail}
-                        </Text>
-                      </div>
-                      <div className="flex flex-row justify-between items-center">
-                        <Text size="2xl" as="p" className="mb-px ">
-                          {bid.serviceDescription}
-                        </Text>
-                        <Text size="lg" as="p" className="mt-[10px]">
-                          {bid.shippingCost}
-                        </Text>
-                        <BButton
-                          variant="dark"
-                          disabled={!isFormFilled()}
-                          onClick={() => {
-                            save(id, bid.supplierId);
-                            handleClose();
-                          }}
-                        >
-                          select Bid
-                        </BButton>
-                      </div>
-                    </div>
-                  );
-                })}
+                <table className="table">
+                  <thead className="thead-dark">
+                    <tr>
+                      <th scope="col">Title</th>
+                      <th scope="col">Supplier</th>
+                      <th scope="col">Email</th>
+                      <th scope="col">Description</th>
+                      <th scope="col">ShippingCost</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bids.map((bid, index) => (
+                      <TableRow
+                        key={index}
+                        bid={bid}
+                        id={id}
+                        save={save}
+                        handleClose={handleClose}
+                      />
+                    ))}
+                  </tbody>
+                </table>
               </Modal.Body>
             </Form>
             <Modal.Footer>
@@ -99,10 +93,34 @@ const ViewBids = ({ order, save }) => {
       )}
     </>
   );
-};
+}
 
 ViewBids.propTypes = {
+  order: PropTypes.object.isRequired,
   save: PropTypes.func.isRequired,
 };
+
+function TableRow({ bid, id, save, handleClose }) {
+  return (
+    <tr>
+      <td>{bid.quotationTitle}</td>
+      <td>{bid.supplierName}</td>
+      <td>{bid.supplierEmail}</td>
+      <td>{bid.serviceDescription}</td>
+      <td>{Number(bid.shippingCost)}</td>
+      <td>
+        <BButton
+          variant="dark"
+          onClick={() => {
+            save(id, bid.supplierId);
+            handleClose();
+          }}
+        >
+          Select Bid
+        </BButton>
+      </td>
+    </tr>
+  );
+}
 
 export default ViewBids;
