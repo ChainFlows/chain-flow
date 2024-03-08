@@ -76,6 +76,7 @@ export const OrderDetails = Record({
   expectedDelivery: text, // This is the client expected Date and Time
   delivery: Opt(text), // This is the supplier delivery Date and Time
   driverId: Opt(text), // This is the id of the driver that is assigned to the order
+  supplierId: Opt(text), // This is the id of the supplier that is assigned to the order
   pickupAddress: text,
   deliveryAddress: text,
   orderStatus: text, // This is the status of the order
@@ -87,9 +88,9 @@ export const OrderDetails = Record({
   items: Vec(text), // This will be a list of items
 });
 
-export const Quatation = Record({
+export const Quotation = Record({
   id: text,
-  quatationTitle: text,
+  quotationTitle: text,
   supplierId: text,
   orderId: text, // referenced to order details
   supplierName: text,
@@ -97,7 +98,7 @@ export const Quatation = Record({
   supplierEmail: text,
   serviceDescription: text, // This is the description of how the order is fulfilled
   shippingCost: nat64, // This is the total price of the order
-  quatationStatus: text, // This is the status of the quatation eg(Accepted, Rejected, etc)
+  quotationStatus: text, // This is the status of the quotation eg(Accepted, Rejected, etc)
 });
 
 export const ClientCompanyPayload = Record({
@@ -165,8 +166,8 @@ export const OrderDetailsPayload = Record({
   category: text, // This will be categorized in base of eg(Metal, Food, etc)
 });
 
-export const QuatationPayload = Record({
-  quatationTitle: text,
+export const QuotationPayload = Record({
+  quotationTitle: text,
   supplierId: text,
   orderId: text, // referenced to order details
   serviceDescription: text, // This is the description of how the order is fulfilled

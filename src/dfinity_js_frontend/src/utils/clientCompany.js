@@ -71,6 +71,62 @@ export async function addAffiliatedCompany(clientId, companyName) {
   }
 }
 
+// getClientCompanyByOwner
+export async function getClientCompanyByOwner() {
+  try {
+    return await window.canister.chainflow.getClientCompanyByOwner();
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return {};
+  }
+}
+
+// getClientCompanyActiveOrders
+export async function getClientCompanyActiveOrders(clientId) {
+  try {
+    return await window.canister.chainflow.getClientCompanyActiveOrders(
+      clientId
+    );
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
+}
+
+// getClientCompanyCompletedOrders
+export async function getClientCompanyCompletedOrders(clientId) {
+  try {
+    return await window.canister.chainflow.getClientCompanyCompletedOrders(
+      clientId
+    );
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
+}
+
+// getClientCompanyNewOrders
+export async function getClientCompanyNewOrders(clientId) {
+  try {
+    return await window.canister.chainflow.getClientCompanyNewOrders(clientId);
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
+}
+
 export async function addProduct(clientId, productName) {
   try {
     return await window.canister.chainflow.addProduct(clientId, productName);

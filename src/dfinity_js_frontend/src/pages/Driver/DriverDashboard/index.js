@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import {
   Text,
@@ -13,18 +13,18 @@ import Wallet from "../../../components/Wallet";
 import MaintainanceRecord from "../../maintainanceRecords/MaintainanceRecord";
 import {
   createMaintainanceRecord,
-  getDriverMaintainanceRecords,
+  getDriverActiveOrder,
   getDriverCompletedOrders,
 } from "../../../utils/driver";
 import { toast } from "react-toastify";
 
 export default function DriverDashboard({ driver }) {
   const [loading, setLoading] = useState(false);
-  const [maintainances, setMaintainances] = useState([]);
   const [completedOrders, setCompletedOrders] = useState([]);
+  const [activeOrder, setActiveOrder] = useState({});
   const [tab, setTab] = useState("completed");
 
-  const { id } = driver;
+  const { id, maintainanceRecords } = driver;
 
   const save = async (data) => {
     try {
@@ -53,11 +53,11 @@ export default function DriverDashboard({ driver }) {
     }
   });
 
-  // function to fetch maintainance records
-  const fetchMaintainances = useCallback(async () => {
+  // get getDriverActiveOrder
+  const fetchActiveOrder = useCallback(async () => {
     try {
       setLoading(true);
-      setMaintainances(await getDriverMaintainanceRecords(driver.id));
+      setActiveOrder(await getDriverActiveOrder(driver.id));
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -67,7 +67,8 @@ export default function DriverDashboard({ driver }) {
 
   useEffect(() => {
     fetchCompletedOrders();
-    fetchMaintainances();
+    fetchActiveOrder();
+    // fetchMaintainances();
   }, []);
   return (
     <>
@@ -82,7 +83,7 @@ export default function DriverDashboard({ driver }) {
               content="Web site created using create-react-app"
             />
           </Helmet>
-          <div className="flex flex-row justify-start w-full bg-gray-200 shadow-sm">
+          <div className="flex flex-row justify-start w-full border-rose-500 bg-gray-200 h-full shadow-sm">
             <div className="flex flex-row justify-start items-start w-full gap-7 mx-auto max-w-[85%]">
               <div className="flex flex-col items-center justify-start w-[100%] mt-[2rem]">
                 <div className="h-[361px] w-full z-[1] relative">
@@ -94,17 +95,17 @@ export default function DriverDashboard({ driver }) {
                             <Text size="7xl" as="p">
                               Driver Overview
                             </Text>
-                            <div className="flex flex-row justify-center items-center w-[67%]">
+                            <div className="flex flex-row justify-between items-center w-[67%]">
                               <MaintainanceRecord save={save} />
                               <Img
                                 src={Images.img_image_399}
                                 alt="image399_one"
-                                className="w-[6%] ml-2 object-cover rounded-[12px]"
+                                className="w-[6%]  object-cover rounded-[12px]"
                               />
                               <Img
                                 src={Images.img_image_386}
                                 alt="image386_one"
-                                className="w-[36px] ml-[27px] object-cover rounded-[12px]"
+                                className="w-[6%] object-cover rounded-[12px]"
                               />
                               <Wallet />
                             </div>
@@ -114,7 +115,7 @@ export default function DriverDashboard({ driver }) {
                               <div className="flex flex-row justify-start w-[38%] p-[22px] bg-white-A700_e0 shadow-xs rounded-[19px]">
                                 <div className="flex flex-col items-start justify-start w-[76%] mb-[21px] ml-[3px] gap-[7px]">
                                   <Text
-                                    size="2xl"
+                                    size="3xl"
                                     as="p"
                                     className="ml-[71px] !text-green-700 opacity-0.59"
                                   >
@@ -127,7 +128,10 @@ export default function DriverDashboard({ driver }) {
                                       className="h-[32px] w-[32px}"
                                     />
                                     <Text size="6xl" as="p">
-                                      Job Name: 3600
+                                      {activeOrder?.orderName}
+                                    </Text>
+                                    <Text size="6xl" as="p">
+                                      {activeOrder?.orderStatus}
                                     </Text>
                                   </div>
                                 </div>
@@ -138,7 +142,7 @@ export default function DriverDashboard({ driver }) {
                                     color="blue_gray_900_0c"
                                     size="6xl"
                                     className="ml-px min-w-[200px] rounded-[20px]"
-                                    onclick={() => setTab("completed")}
+                                    onClick={() => setTab("completed")}
                                   >
                                     Completed Jobs
                                   </Button>
@@ -146,7 +150,7 @@ export default function DriverDashboard({ driver }) {
                                     color="blue_gray_900_0c"
                                     size="6xl"
                                     className="ml-px min-w-[200px] rounded-[20px]"
-                                    onclick={() => setTab("maintainance")}
+                                    onClick={() => setTab("maintainance")}
                                   >
                                     Maintanance records
                                   </Button>
@@ -242,7 +246,7 @@ export default function DriverDashboard({ driver }) {
                   </div>
                   <div className="flex flex-col gap-4 w-[80%]">
                     {tab === "maintainance" &&
-                      maintainances.map((maintainance, index) => (
+                      maintainanceRecords.map((maintainance, index) => (
                         <div
                           key={index}
                           className="flex flex-row justify-center w-full p-2 bg-white-A700_01 shadow-xs rounded-[12px]"
@@ -253,36 +257,23 @@ export default function DriverDashboard({ driver }) {
                               alt="image389_one"
                               className="w-[86px] object-cover rounded-[12px]"
                             />
-                            <div className="flex flex-col items-start justify-start w-[84%]">
-                              <div className="flex flex-row justify-start items-end">
-                                <Text as="p" className="mb-[15px]">
-                                  {maintainance}
+                            <div className="flex flex-col items-star justify-star w-[84%]">
+                              <div className="flex flex-row justify-between items-center">
+                                <Text size="3xl" as="p" className="mb-px ">
+                                  {maintainance.vehicleRegNo}
                                 </Text>
-
-                                <Text
-                                  size="2xl"
-                                  as="p"
-                                  className="mb-px ml-[7px]"
-                                >
-                                  Real-time
+                                <Text size="2xl" as="p" className="mb-px ">
+                                  {maintainance.date}
                                 </Text>
-                                <Text
-                                  size="2xl"
-                                  as="p"
-                                  className="mb-px ml-[9px]"
-                                >
-                                  Efficiency
+                                <Text size="2xl" as="p" className="mb-px ">
+                                  {maintainance.mechanic}
                                 </Text>
-                                <Text
-                                  size="2xl"
-                                  as="p"
-                                  className="mb-px ml-[33px]"
-                                >
-                                  Supply
+                                <Text size="2xl" as="p" className="mb-px ">
+                                  {maintainance.cost}
                                 </Text>
                               </div>
-                              <Text size="lg" as="p" className="mt-[-4px]">
-                                link.product-360o..link
+                              <Text size="lg" as="p" className="mt-[10px]">
+                                {maintainance.description}
                               </Text>
                             </div>
                           </div>
@@ -294,40 +285,28 @@ export default function DriverDashboard({ driver }) {
                           key={index}
                           className="flex flex-row justify-center w-full p-2 bg-white-A700_01 shadow-xs rounded-[12px]"
                         >
-                          <div className="flex flex-row justify-start items-center w-[95%] gap-[17px]">
+                          <div className="flex flex-row justify-between items-center w-[95%] gap-[17px]">
                             <Img
                               src={Images.img_image_389}
                               alt="image389_one"
                               className="w-[86px] object-cover rounded-[12px]"
                             />
-                            <div className="flex flex-col items-start justify-start w-[84%]">
+                            <div className="flex flex-col w-[84%]">
                               <div className="flex flex-row justify-start items-center">
-                                <Text as="p" className="mb-[15px]">
+                                <Text as="p" size="2xl" className="ml-[5px]">
                                   {order.orderName}
                                 </Text>
-                                <Text
-                                  size="2xl"
-                                  as="p"
-                                  className="mb-px ml-[7px]"
-                                >
+                                <Text size="2xl" as="p" className="mb-px">
                                   {order.weight}
                                 </Text>
-                                <Text
-                                  size="2xl"
-                                  as="p"
-                                  className="mb-px ml-[9px]"
-                                >
+                                <Text size="2xl" as="p" className="mb-px">
                                   {order.delivery}
                                 </Text>
-                                <Text
-                                  size="2xl"
-                                  as="p"
-                                  className="mb-px ml-[33px]"
-                                >
+                                <Text size="2xl" as="p" className="mb-px">
                                   {order.weight}
                                 </Text>
                               </div>
-                              <Text size="lg" as="p" className="mt-[-4px]">
+                              <Text size="lg" as="p" className="mt-[10px]">
                                 {order.id}
                               </Text>
                             </div>
@@ -342,24 +321,23 @@ export default function DriverDashboard({ driver }) {
                           alt="image389_one"
                           className="w-[86px] object-cover rounded-[12px]"
                         />
-                        <div className="flex flex-col items-start justify-start w-[84%]">
-                          <div className="flex flex-row justify-start items-end">
-                            <Text as="p" className="mb-[15px]">
-                              Product - 3600
+                        <div className="flex flex-col w-[84%]">
+                          <div className="flex flex-row justify-between items-center">
+                            <Text size="3xl" as="p" className="mb-px ">
+                              {"vehicleRegNo"}
                             </Text>
-
-                            <Text size="2xl" as="p" className="mb-px ml-[7px]">
-                              Real-time
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"date"}
                             </Text>
-                            <Text size="2xl" as="p" className="mb-px ml-[9px]">
-                              Efficiency
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"mechanic"}
                             </Text>
-                            <Text size="2xl" as="p" className="mb-px ml-[33px]">
-                              Supply
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"cost"}
                             </Text>
                           </div>
-                          <Text size="lg" as="p" className="mt-[-4px]">
-                            link.product-360o..link
+                          <Text size="lg" as="p" className="mt-[10px]">
+                            {"description"}
                           </Text>
                         </div>
                       </div>
@@ -371,24 +349,23 @@ export default function DriverDashboard({ driver }) {
                           alt="image389_one"
                           className="w-[86px] object-cover rounded-[12px]"
                         />
-                        <div className="flex flex-col items-start justify-start w-[84%]">
-                          <div className="flex flex-row justify-start items-end">
-                            <Text as="p" className="mb-[15px]">
-                              Product - 3600
+                        <div className="flex flex-col w-[84%]">
+                          <div className="flex flex-row justify-between items-center">
+                            <Text size="3xl" as="p" className="mb-px ">
+                              {"vehicleRegNo"}
                             </Text>
-
-                            <Text size="2xl" as="p" className="mb-px ml-[7px]">
-                              Real-time
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"date"}
                             </Text>
-                            <Text size="2xl" as="p" className="mb-px ml-[9px]">
-                              Efficiency
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"mechanic"}
                             </Text>
-                            <Text size="2xl" as="p" className="mb-px ml-[33px]">
-                              Supply
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"cost"}
                             </Text>
                           </div>
-                          <Text size="lg" as="p" className="mt-[-4px]">
-                            link.product-360o..link
+                          <Text size="lg" as="p" className="mt-[10px]">
+                            {"description"}
                           </Text>
                         </div>
                       </div>
@@ -400,53 +377,51 @@ export default function DriverDashboard({ driver }) {
                           alt="image389_one"
                           className="w-[86px] object-cover rounded-[12px]"
                         />
-                        <div className="flex flex-col items-start justify-start w-[84%]">
-                          <div className="flex flex-row justify-start items-end">
-                            <Text as="p" className="mb-[15px]">
-                              Product - 3600
+                        <div className="flex flex-col w-[84%]">
+                          <div className="flex flex-row justify-between items-center">
+                            <Text size="3xl" as="p" className="mb-px ">
+                              {"vehicleRegNo"}
                             </Text>
-
-                            <Text size="2xl" as="p" className="mb-px ml-[7px]">
-                              Real-time
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"date"}
                             </Text>
-                            <Text size="2xl" as="p" className="mb-px ml-[9px]">
-                              Efficiency
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"mechanic"}
                             </Text>
-                            <Text size="2xl" as="p" className="mb-px ml-[33px]">
-                              Supply
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"cost"}
                             </Text>
                           </div>
-                          <Text size="lg" as="p" className="mt-[-4px]">
-                            link.product-360o..link
+                          <Text size="lg" as="p" className="mt-[10px]">
+                            {"description"}
                           </Text>
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-row justify-center w-full p-[7px] bg-white-A700_01 shadow-xs rounded-[12px]">
+                    <div className="flex mb-96 flex-row justify-center w-full p-[7px] bg-white-A700_01 shadow-xs rounded-[12px]">
                       <div className="flex flex-row justify-start items-center w-[95%] gap-[19px]">
                         <Img
                           src={Images.img_image_381}
                           alt="image381_one"
                           className="w-[84px] object-cover rounded-[12px]"
                         />
-                        <div className="flex flex-col items-start justify-start w-[84%]">
-                          <div className="flex flex-row justify-start items-end">
-                            <Text as="p" className="mb-[15px]">
-                              Product - 3600
+                        <div className="flex flex-col w-[84%]">
+                          <div className="flex flex-row justify-between items-center">
+                            <Text size="3xl" as="p" className="mb-px ">
+                              {"vehicleRegNo"}
                             </Text>
-
-                            <Text size="2xl" as="p" className="mb-px ml-[7px]">
-                              Real-time
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"date"}
                             </Text>
-                            <Text size="2xl" as="p" className="mb-px ml-[9px]">
-                              Efficiency
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"mechanic"}
                             </Text>
-                            <Text size="2xl" as="p" className="mb-px ml-[33px]">
-                              Supply
+                            <Text size="2xl" as="p" className="mb-px ">
+                              {"cost"}
                             </Text>
                           </div>
-                          <Text size="lg" as="p" className="mt-[-4px]">
-                            link.product-360o..link
+                          <Text size="lg" as="p" className="mt-[10px]">
+                            {"description"}
                           </Text>
                         </div>
                       </div>

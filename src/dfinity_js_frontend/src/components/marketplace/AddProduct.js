@@ -8,7 +8,8 @@ const AddProduct = ({ save }) => {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [price, setPrice] = useState(0);
-  const isFormFilled = () => title && attachmentURL && description && location && price;
+  const isFormFilled = () =>
+    title && attachmentURL && description && location && price;
 
   const [show, setShow] = useState(false);
 
@@ -23,7 +24,8 @@ const AddProduct = ({ save }) => {
         className="rounded-pill px-0"
         style={{ width: "38px" }}
       >
-        <i class="bi bi-plus"></i>
+        className= className=
+        <i className="bi bi-plus"></i>
       </Button>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>

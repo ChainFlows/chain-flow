@@ -51,7 +51,7 @@ import * as Types from "./types";
 const clientsCompanyStorage = StableBTreeMap(0, text, Types.ClientCompany);
 const supplyCompanyStorage = StableBTreeMap(1, text, Types.SupplyCompany);
 const orderDetailsStorage = StableBTreeMap(2, text, Types.OrderDetails);
-const quatationStorage = StableBTreeMap(3, text, Types.Quatation);
+const quotationStorage = StableBTreeMap(3, text, Types.Quotation);
 const maintainanceRecordStorage = StableBTreeMap(
   4,
   text,
@@ -145,6 +145,74 @@ export default Canister({
     }
   ),
 
+  // get client company by owner using filter
+  getClientCompanyByOwner: query(
+    [],
+    Result(Types.ClientCompany, Types.Message),
+    () => {
+      const clientCompanyOpt = clientsCompanyStorage
+        .values()
+        .filter((clientCompany) => {
+          return clientCompany.owner.toText() === ic.caller().toText();
+        });
+      if (clientCompanyOpt.length === 0) {
+        return Err({
+          NotFound: `client company with owner=${ic.caller()} not found`,
+        });
+      }
+      return Ok(clientCompanyOpt[0]);
+    }
+  ),
+
+  // get client company orders. they have status of  not "completed"
+  getClientCompanyActiveOrders: query(
+    [text],
+    Result(Types.OrderDetails, Types.Message),
+    (companyId) => {
+      const orders = orderDetailsStorage.values();
+      const orderslist = orders.filter(
+        (order) =>
+          order.companyId === companyId &&
+          order.supplierId &&
+          order.orderStatus !== "completed"
+      );
+
+      if (orderslist.length === 0) {
+        return Err({
+          NotFound: `client company with id=${companyId} has no active orders`,
+        });
+      }
+
+      return Ok(orderslist[0]);
+    }
+  ),
+
+  // get client company completed orders
+  getClientCompanyCompletedOrders: query(
+    [text],
+    Vec(Types.OrderDetails),
+    (companyId) => {
+      const orders = orderDetailsStorage.values();
+      return orders.filter(
+        (order) =>
+          order.companyId === companyId && order.orderStatus === "completed"
+      );
+    }
+  ),
+
+  //   search for client company new orders where supplier is not assigned
+  getClientCompanyNewOrders: query(
+    [text],
+    Vec(Types.OrderDetails),
+    (companyId) => {
+      const orders = orderDetailsStorage.values();
+      return orders.filter(
+        (order) =>
+          order.companyId === companyId && order.supplierId.None === null
+      );
+    }
+  ),
+
   // search for client company by name or business type
   searchClientCompany: query([text], Vec(Types.ClientCompany), (search) => {
     const clientCompanies = clientsCompanyStorage.values();
@@ -214,6 +282,72 @@ export default Canister({
     }
   ),
 
+  // get supply company by owner using filter
+  getSupplyCompanyByOwner: query(
+    [],
+    Result(Types.SupplyCompany, Types.Message),
+    () => {
+      const supplyCompanyOpt = supplyCompanyStorage
+        .values()
+        .filter((supplyCompany) => {
+          return supplyCompany.owner.toText() === ic.caller().toText();
+        });
+      if (supplyCompanyOpt.length === 0) {
+        return Err({
+          NotFound: `supply company with owner=${ic.caller()} not found`,
+        });
+      }
+      return Ok(supplyCompanyOpt[0]);
+    }
+  ),
+
+  // get completed orders by supply company
+  getSupplyCompanyCompletedOrders: query(
+    [text],
+    Vec(Types.OrderDetails),
+    (companyId) => {
+      const orders = orderDetailsStorage.values();
+      return orders.filter(
+        (order) =>
+          order.supplierId === companyId && order.orderStatus === "completed"
+      );
+    }
+  ),
+
+  // get supply company orders. they have status of  not "completed"
+  getSupplyCompanyActiveOrders: query(
+    [text],
+    Result(Types.OrderDetails, Types.Message),
+    (companyId) => {
+      const orders = orderDetailsStorage.values();
+      const orderslist = orders.filter(
+        (order) =>
+          order.supplierId === companyId && order.orderStatus !== "completed"
+      );
+
+      if (orderslist.length === 0) {
+        return Err({
+          NotFound: `supply company with id=${companyId} has no active orders`,
+        });
+      }
+
+      return Ok(orderslist[0]);
+    }
+  ),
+
+  // function to get supply company orders that have not assigned driver
+  getSupplyCompanyNewOrders: query(
+    [text],
+    Vec(Types.OrderDetails),
+    (supplierId) => {
+      const orders = orderDetailsStorage.values();
+      return orders.filter(
+        (order) =>
+          order.supplierId === supplierId && order.driverId.length === 0
+      );
+    }
+  ),
+
   //   search for supply company by name or business type
   searchSupplyCompany: query([text], Vec(Types.SupplyCompany), (search) => {
     const supplyCompanies = supplyCompanyStorage.values();
@@ -275,6 +409,7 @@ export default Canister({
         id: uuidv4(),
         delivery: None,
         driverId: None,
+        supplierId: None,
         items: [],
         ...payload,
       };
@@ -295,6 +430,22 @@ export default Canister({
       }
       const orderDetails = orderDetailsOpt.Some;
       orderDetails.items.push(item);
+      orderDetailsStorage.insert(orderDetails.id, orderDetails);
+      return Ok(orderDetails);
+    }
+  ),
+
+  // assign supplier
+  assignSupplier: update(
+    [text, text],
+    Result(Types.OrderDetails, Types.Message),
+    (orderId, supplierId) => {
+      const orderDetailsOpt = orderDetailsStorage.get(orderId);
+      if ("None" in orderDetailsOpt) {
+        return Err({ NotFound: `order details with id=${orderId} not found` });
+      }
+      const orderDetails = orderDetailsOpt.Some;
+      orderDetails.supplierId = Some(supplierId);
       orderDetailsStorage.insert(orderDetails.id, orderDetails);
       return Ok(orderDetails);
     }
@@ -377,10 +528,10 @@ export default Canister({
     );
   }),
 
-  // function to create quatation using QuatationPayload getting supplier details of supplier company and order details
-  createQuatation: update(
-    [Types.QuatationPayload],
-    Result(Types.Quatation, Types.Message),
+  // function to create quotation using QuotationPayload getting supplier details of supplier company and order details
+  createQuotation: update(
+    [Types.QuotationPayload],
+    Result(Types.Quotation, Types.Message),
     (payload) => {
       // Check if the payload is a valid object
       if (typeof payload !== "object" || Object.keys(payload).length === 0) {
@@ -397,60 +548,60 @@ export default Canister({
       const supplier = supplierOpt.Some;
 
       // Create an event with a unique id generated using UUID v4
-      const quatation = {
+      const quotation = {
         id: uuidv4(),
         supplierName: supplier.name,
         supplierAddress: supplier.address,
         supplierEmail: supplier.email,
-        quatationStatus: "pending",
+        quotationStatus: "pending",
         ...payload,
       };
 
       // Insert the event into the eventsStorage
-      quatationStorage.insert(quatation.id, quatation);
-      return Ok(quatation);
+      quotationStorage.insert(quotation.id, quotation);
+      return Ok(quotation);
     }
   ),
 
-  //   get all quatations
-  getAllQuatations: query([], Vec(Types.Quatation), () => {
-    return quatationStorage.values();
+  //   get all quotations
+  getAllQuotations: query([], Vec(Types.Quotation), () => {
+    return quotationStorage.values();
   }),
 
-  // function to get quatation by id
-  getQuatation: query([text], Result(Types.Quatation, Types.Message), (id) => {
-    const quatationOpt = quatationStorage.get(id);
-    if ("None" in quatationOpt) {
-      return Err({ NotFound: `quatation with id=${id} not found` });
+  // function to get quotation by id
+  getQuotation: query([text], Result(Types.Quotation, Types.Message), (id) => {
+    const quotationOpt = quotationStorage.get(id);
+    if ("None" in quotationOpt) {
+      return Err({ NotFound: `quotation with id=${id} not found` });
     }
-    return Ok(quatationOpt.Some);
+    return Ok(quotationOpt.Some);
   }),
 
-  // sort quatations by company Name in order details  using company Id
-  sortQuatationsByCompanyName: query(
+  // sort quotations by company Name in order details  using company Id
+  sortQuotationsByCompanyName: query(
     [text],
-    Vec(Types.Quatation),
+    Vec(Types.Quotation),
     (companyId) => {
-      const quatations = quatationStorage.values();
-      return quatations.filter(
-        (quatation) => quatation.companyId === companyId
+      const quotations = quotationStorage.values();
+      return quotations.filter(
+        (quotation) => quotation.companyId === companyId
       );
     }
   ),
 
-  //  update quatation status
-  updateQuatationStatus: update(
+  //  update quotation status
+  updateQuotationStatus: update(
     [text, text],
-    Result(Types.Quatation, Types.Message),
-    (quatationId, status) => {
-      const quatationOpt = quatationStorage.get(quatationId);
-      if ("None" in quatationOpt) {
-        return Err({ NotFound: `quatation with id=${quatationId} not found` });
+    Result(Types.Quotation, Types.Message),
+    (quotationId, status) => {
+      const quotationOpt = quotationStorage.get(quotationId);
+      if ("None" in quotationOpt) {
+        return Err({ NotFound: `quotation with id=${quotationId} not found` });
       }
-      const quatation = quatationOpt.Some;
-      quatation.quatationStatus = status;
-      quatationStorage.insert(quatation.id, quatation);
-      return Ok(quatation);
+      const quotation = quotationOpt.Some;
+      quotation.quotationStatus = status;
+      quotationStorage.insert(quotation.id, quotation);
+      return Ok(quotation);
     }
   ),
 
@@ -493,14 +644,9 @@ export default Canister({
 
   // function to get driver with the same owner as ic.caller() using filter
   getDriverByOwnerFilter: query([], Result(Types.Driver, Types.Message), () => {
-    console.log("caller", ic.caller());
-    console.log("caller str", ic.caller().toText());
     const driverOpt = driverStorage.values().filter((driver) => {
-      console.log("driver.owner", driver.owner);
-      console.log("owner str", driver.owner.toText());
       return driver.owner.toText() === ic.caller().toText();
     });
-    console.log(driverOpt);
     if (driverOpt.length === 0) {
       return Err({ NotFound: `driver with owner=${ic.caller()} not found` });
     }
@@ -642,6 +788,27 @@ export default Canister({
     }
   ),
 
+  // get driver orders. they have status of  not "completed"
+  getDriverActiveOrder: query(
+    [text],
+    Result(Types.OrderDetails, Types.Message),
+    (driverId) => {
+      const orders = orderDetailsStorage.values();
+      const orderslist = orders.filter(
+        (order) =>
+          order.driverId === driverId && order.orderStatus !== "completed"
+      );
+
+      if (orderslist.length === 0) {
+        return Err({
+          NotFound: `driver with id=${driverId} has no active orders`,
+        });
+      }
+
+      return Ok(orderslist[0]);
+    }
+  ),
+
   // get driver completed orders. they have status of "completed"
   getDriverCompletedOrders: query(
     [text],
@@ -667,16 +834,7 @@ export default Canister({
 
       // get records with id in driver.maintainanceRecords
       const driver = driverOpt.Some;
-      const records = driver.maintainanceRecords.map((record: text) => {
-        const recordOpt = maintainanceRecordStorage.get(record);
-        if ("None" in recordOpt) {
-          return Err({
-            NotFound: `maintainance record with id=${record} not found`,
-          });
-        }
-        return recordOpt.Some;
-      });
-
+      const records = driver.maintainanceRecords;
       return records;
     }
   ),
