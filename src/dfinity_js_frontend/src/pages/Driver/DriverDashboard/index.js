@@ -20,7 +20,6 @@ import { toast } from "react-toastify";
 
 export default function DriverDashboard({ driver }) {
   const [loading, setLoading] = useState(false);
-  const [maintainances, setMaintainances] = useState([]);
   const [completedOrders, setCompletedOrders] = useState([]);
   const [activeOrder, setActiveOrder] = useState({});
   const [tab, setTab] = useState("completed");

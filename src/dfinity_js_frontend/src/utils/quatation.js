@@ -1,60 +1,63 @@
-export async function createQuatation(quatationPayload) {
-    try {
-      return await window.canister.chainflow.createQuatation(quatationPayload);
-    } catch (err) {
-      if (err.name === "AgentHTTPResponseError") {
-        const authClient = window.auth.client;
-        await authClient.logout();
-      }
-      return {};
+export async function createQuotation(quotationPayload) {
+  try {
+    return await window.canister.chainflow.createQuotation(quotationPayload);
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return {};
+  }
+}
+
+export async function getQuotation(id) {
+  try {
+    return await window.canister.chainflow.getQuotation(id);
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return {};
+  }
+}
+
+export async function getAllQuotations() {
+  try {
+    return await window.canister.chainflow.getAllQuotations();
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
+}
+
+export async function sortQuotationsByCompanyName(companyId) {
+  try {
+    return await window.canister.chainflow.sortQuotationsByCompanyName(
+      companyId
+    );
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
+}
+
+export async function updateQuotationStatus(quotationId, status) {
+  try {
+    return await window.canister.chainflow.updateQuotationStatus(
+      quotationId,
+      status
+    );
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
     }
   }
-  
-  export async function getQuatation(id) {
-    try {
-      return await window.canister.chainflow.getQuatation(id);
-    } catch (err) {
-      if (err.name === "AgentHTTPResponseError") {
-        const authClient = window.auth.client;
-        await authClient.logout();
-      }
-      return {};
-    }
-  }
-  
-  export async function getAllQuatations() {
-    try {
-      return await window.canister.chainflow.getAllQuatations();
-    } catch (err) {
-      if (err.name === "AgentHTTPResponseError") {
-        const authClient = window.auth.client;
-        await authClient.logout();
-      }
-      return [];
-    }
-  }
-  
-  export async function sortQuatationsByCompanyName(companyId) {
-    try {
-      return await window.canister.chainflow.sortQuatationsByCompanyName(companyId);
-    } catch (err) {
-      if (err.name === "AgentHTTPResponseError") {
-        const authClient = window.auth.client;
-        await authClient.logout();
-      }
-      return [];
-    }
-  }
-  
-  export async function updateQuatationStatus(quatationId, status) {
-    try {
-      return await window.canister.chainflow.updateQuatationStatus(quatationId, status);
-    } catch (err) {
-      if (err.name === "AgentHTTPResponseError") {
-        const authClient = window.auth.client;
-        await authClient.logout();
-      }
-    }
-  }
-  
-  
+}

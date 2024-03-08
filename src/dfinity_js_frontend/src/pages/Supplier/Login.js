@@ -12,12 +12,12 @@ const Login = ({ login }) => {
           className=" ratio ratio-1x1 mx-auto mb-2"
           style={{ maxWidth: "320px" }}
         ></div>
-        <h1>User Login</h1>
+        <h1>Driver Login</h1>
         <p>Please connect your wallet to continue.</p>
         <Button
           onClick={login}
           variant="outline"
-          className="rounded-pill mx-auto px-3 mt-3"
+          className="rounded-pill px-3 mt-3"
         >
           Connect Wallet
         </Button>

@@ -2,22 +2,21 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
 
-const AddSuplier = ({save}) => {
+const AddSuplier = ({ save }) => {
+  const [name, setName] = useState("");
+  const [bussinessType, setBussinessType] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState("");
+  const [ownerName, setOwnerName] = useState("");
+  const [regNo, setRegNo] = useState("");
+  const [logo, setLogo] = useState("");
 
-    const [name, setName] = useState("");
-    const [bussinessType , setBussinessType] = useState("");
-    const [address , setAddress] = useState("");
-    const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
-    const [website, setWebsite] = useState("");
-    const [ownerName, setOwnerName] = useState("");
-    const [regNo, setRegNo] = useState("");
-    const [logo, setLogo] = useState("");
-    
-    const [show, setShow] = useState(false);
+  const [show, setShow] = useState(false);
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
   return (
     <>
       <Button
@@ -26,7 +25,7 @@ const AddSuplier = ({save}) => {
         className="rounded-pill px-0"
         style={{ width: "38px" }}
       >
-        <i class="bi bi-plus"></i>
+        <i className="bi bi-plus"></i>
       </Button>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
@@ -34,11 +33,7 @@ const AddSuplier = ({save}) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <FloatingLabel
-              controlId="inputName"
-              label="Name"
-              className="mb-3"
-            >
+            <FloatingLabel controlId="inputName" label="Name" className="mb-3">
               <Form.Control
                 type="text"
                 onChange={(e) => {
@@ -114,72 +109,68 @@ const AddSuplier = ({save}) => {
             </FloatingLabel>
             <FloatingLabel
               controlId="inputOwnerName"
-                label="Owner Name"
-                className="mb-3"
+              label="Owner Name"
+              className="mb-3"
             >
-                <Form.Control
-                    type="text"
-                    placeholder="Owner Name"
-                    onChange={(e) => {
-                    setOwnerName(e.target.value);
-                    }}
-                />
+              <Form.Control
+                type="text"
+                placeholder="Owner Name"
+                onChange={(e) => {
+                  setOwnerName(e.target.value);
+                }}
+              />
             </FloatingLabel>
             <FloatingLabel
               controlId="inputRegNo"
               label="Registration No"
               className="mb-3"
             >
-                <Form.Control
-                    type="text"
-                    placeholder="Registration No"
-                    onChange={(e) => {
-                    setRegNo(e.target.value);
-                    }}
-                />
+              <Form.Control
+                type="text"
+                placeholder="Registration No"
+                onChange={(e) => {
+                  setRegNo(e.target.value);
+                }}
+              />
             </FloatingLabel>
-            <FloatingLabel
-              controlId="inputLogo"
-              label="Logo"
-              className="mb-3"
+            <FloatingLabel controlId="inputLogo" label="Logo" className="mb-3">
+              <Form.Control
+                type="text"
+                placeholder="Logo"
+                onChange={(e) => {
+                  setLogo(e.target.value);
+                }}
+              />
+            </FloatingLabel>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                save({
+                  name,
+                  bussinessType,
+                  address,
+                  email,
+                  phone,
+                  website,
+                  ownerName,
+                  regNo,
+                  logo,
+                });
+                handleClose();
+              }}
             >
-                <Form.Control
-                    type="text"
-                    placeholder="Logo"
-                    onChange={(e) => {
-                    setLogo(e.target.value);
-                    }}
-                />
-            </FloatingLabel>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
-                <Button
-                    variant="primary"
-                    onClick={() => {
-                        save({
-                            name,
-                            bussinessType,
-                            address,
-                            email,
-                            phone,
-                            website,
-                            ownerName,
-                            regNo,
-                            logo
-                        });
-                        handleClose();
-                    }}
-                >
-                    Save Supplier
-                </Button>
-            </Modal.Footer>
+              Save Supplier
+            </Button>
+          </Modal.Footer>
         </Form>
-        </Modal>
+      </Modal>
     </>
-  )
-}
+  );
+};
 
-export default AddSuplier
+export default AddSuplier;

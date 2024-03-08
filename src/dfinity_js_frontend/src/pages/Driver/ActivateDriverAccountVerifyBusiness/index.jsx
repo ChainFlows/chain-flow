@@ -53,7 +53,9 @@ export default function ActivateDriverAccountVerifyBusinessPage({
       }, 1000);
 
       // window.location.reload();
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
