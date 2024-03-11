@@ -176,7 +176,6 @@ export default Canister({
           order.supplierId.Some &&
           order.orderStatus !== "completed"
       );
-      console.log("order", orders);
 
       return orderslist;
     }
@@ -251,6 +250,7 @@ export default Canister({
         id: uuidv4(),
         owner: ic.caller(),
         drivers: [],
+        reviews: [],
         ...payload,
       };
       // Insert the event into the eventsStorage
@@ -333,7 +333,6 @@ export default Canister({
     Vec(Types.OrderDetails),
     (companyId) => {
       const orders = orderDetailsStorage.values();
-      console.log("new orders", orders);
       return orders.filter(
         (order) =>
           order.supplierId.Some === companyId && order.driverId.None === null
@@ -398,6 +397,9 @@ export default Canister({
     [Types.OrderDetailsPayload],
     Result(Types.OrderDetails, Types.Message),
     (payload) => {
+      // get client
+      const clientCompanyOpt = clientsCompanyStorage.get(payload.companyId);
+      const client = clientCompanyOpt.Some;
       // Check if the payload is a valid object
       if (typeof payload !== "object" || Object.keys(payload).length === 0) {
         return Err({ NotFound: "invalid payload" });
@@ -408,6 +410,8 @@ export default Canister({
         delivery: None,
         driverId: None,
         supplierId: None,
+        orderStatus: "pending",
+        companyName: client.name,
         items: [],
         ...payload,
       };
@@ -460,6 +464,7 @@ export default Canister({
       }
       const orderDetails = orderDetailsOpt.Some;
       orderDetails.driverId = Some(driverId);
+      orderDetails.orderStatus = "assigned";
       // change driver status
       const driverOpt = driverStorage.get(driverId);
       if ("None" in driverOpt) {
@@ -507,8 +512,8 @@ export default Canister({
     }
   ),
 
-  // mark order as delivered and develop driver ratings
-  markOrderAsDelivered: update(
+  // mark order as Completed and develop driver ratings
+  markOrderAsCompleted: update(
     [Types.CompletionPayload],
     Result(Types.OrderDetails, Types.Message),
     (payload) => {
@@ -519,14 +524,24 @@ export default Canister({
         });
       }
       const orderDetails = orderDetailsOpt.Some;
+      const supplierOpt = supplyCompanyStorage.get(orderDetails.supplierId);
+
       // update driver ratings
       generateDriverRating(
         orderDetails.driverId,
         orderDetails.expectedDelivery,
         payload.condition
       );
+
+      // add review to supplier
+      if ("Some" in supplierOpt) {
+        const supplier = supplierOpt.Some;
+        supplier.reviews.push(payload.review);
+        supplyCompanyStorage.insert(supplier.id, supplier);
+      }
+
+      orderDetails.orderStatus = "completed";
       orderDetails.delivery = new Date().toISOString();
-      console.log("orderDetails", orderDetails);
       orderDetailsStorage.insert(orderDetails.id, orderDetails);
       return Ok(orderDetails);
     }
@@ -570,8 +585,6 @@ export default Canister({
         quotationStatus: "pending",
         ...payload,
       };
-
-      console.log(quotation);
 
       // Insert the event into the eventsStorage
       quotationStorage.insert(quotation.id, quotation);
@@ -646,7 +659,6 @@ export default Canister({
         driverStatus: "active",
         ...payload,
       };
-      console.log("driver created", driver.owner.toText());
       // Insert the event into the eventsStorage
       driverStorage.insert(driver.id, driver);
       return Ok(driver);
@@ -817,7 +829,7 @@ export default Canister({
       const orders = orderDetailsStorage.values();
       const orderslist = orders.filter(
         (order) =>
-          order.driverId === driverId && order.orderStatus !== "completed"
+          order.driverId.Some === driverId && order.orderStatus !== "completed"
       );
 
       if (orderslist.length === 0) {
@@ -838,7 +850,7 @@ export default Canister({
       const orders = orderDetailsStorage.values();
       return orders.filter(
         (order) =>
-          order.driverId === driverId && order.orderStatus === "completed"
+          order.driverId.Some === driverId && order.orderStatus === "completed"
       );
     }
   ),

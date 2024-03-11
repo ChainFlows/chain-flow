@@ -6,6 +6,7 @@ import { Img } from "../../components/utils/Img";
 import { Text } from "../../components/utils/Text";
 import { Button } from "../../components/utils/Button";
 import { Input } from "../../components/utils/Input";
+import { Link } from "react-router-dom";
 
 export default function HomeLandingpagePage() {
   const [searchBarValue, setSearchBarValue] = React.useState("");
@@ -274,13 +275,18 @@ export default function HomeLandingpagePage() {
                     <br />
                     are the skills and a bike
                   </Text>
-                  <Button
-                    color="gray_200"
-                    size="17xl"
-                    className="mt-[22px] min-w-[193px] rounded-[24px]"
+                  <Link
+                    to="/drivers?canisterId=br5f7-7uaaa-aaaaa-qaaca-cai"
+                    className="no-underline"
                   >
-                    Drive with us
-                  </Button>
+                    <Button
+                      color="gray_200"
+                      size="18xl"
+                      className="mt-[31px] min-w-[214px] rounded-[24px] no-underline border-2 border-blue_gray-900_02"
+                    >
+                      Drive with us
+                    </Button>
+                  </Link>
                   <Text
                     size="9xl"
                     as="p"
@@ -304,13 +310,18 @@ export default function HomeLandingpagePage() {
                     <br />
                     loyalty programs, and more.
                   </Text>
-                  <Button
-                    color="gray_200"
-                    size="17xl"
-                    className="mt-10 min-w-[224px] rounded-[24px]"
+                  <Link
+                    to="/suppliers?canisterId=br5f7-7uaaa-aaaaa-qaaca-cai"
+                    className="no-underline"
                   >
-                    Partner with us
-                  </Button>
+                    <Button
+                      color="gray_200"
+                      size="18xl"
+                      className="mt-[31px] min-w-[214px] rounded-[24px] no-underline border-2 border-blue_gray-900_02"
+                    >
+                      Partner with us
+                    </Button>
+                  </Link>
                   <Text
                     size="9xl"
                     as="p"
@@ -339,13 +350,18 @@ export default function HomeLandingpagePage() {
                   >
                     service
                   </Text>
-                  <Button
-                    color="gray_200"
-                    size="18xl"
-                    className="mt-[31px] min-w-[214px] rounded-[24px]"
+                  <Link
+                    to="/clients?canisterId=br5f7-7uaaa-aaaaa-qaaca-cai"
+                    className="no-underline"
                   >
-                    Work with us
-                  </Button>
+                    <Button
+                      color="gray_200"
+                      size="18xl"
+                      className="mt-[31px] min-w-[214px] rounded-[24px] no-underline border-2 border-blue_gray-900_02"
+                    >
+                      Work with us
+                    </Button>
+                  </Link>
                 </div>
               </div>
               <div className="flex flex-row justify-between items-start w-[99%] mt-[74px]">

@@ -39,13 +39,13 @@ export default function ActivateSupplierAccount({ fetchSupplier }) {
         fetchSupplier();
       });
 
-      setInterval(() => {
-        timerInSeconds += 1;
+      // setInterval(() => {
+      //   timerInSeconds += 1;
 
-        if (timerInSeconds >= 2) {
-          window.location.reload();
-        }
-      }, 1000);
+      //   if (timerInSeconds >= 2) {
+      //     window.location.reload();
+      //   }
+      // }, 1000);
     } catch (error) {
       console.log(error);
     }

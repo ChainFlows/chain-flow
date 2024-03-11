@@ -4,12 +4,10 @@ import { Img, Text, Header1, Button, Input } from "../../../components/utils";
 import * as Images from "../../../assets/images";
 
 // import ActivatedriverAccountConnectWalletPage from "../DriverConnectWallet";
-import ActivateAccountVerifyBusinessPage from "../DriverVehicleInformation";
+import DriverVehicleInformation from "../DriverVehicleInformation";
 import { createDriver } from "../../../utils/driver";
 
-export default function ActivateDriverAccountVerifyBusinessPage({
-  fetchDriver,
-}) {
+export default function ActivateDriverAccount({ fetchDriver }) {
   // use states for all fields in the form
   const [fullName, setFullName] = useState("");
   // contactInfo
@@ -219,7 +217,7 @@ export default function ActivateDriverAccountVerifyBusinessPage({
                       License Expiry
                     </Text>
                     <input
-                      type="text"
+                      type="date"
                       name="licenseExpiry"
                       placeholder="mm/dd/yyyy"
                       className="w-full bg-green-50 p-2 rounded-md border border-gray-500 text-black"
@@ -268,7 +266,7 @@ export default function ActivateDriverAccountVerifyBusinessPage({
                 </div> */}
               </div>
             </div>
-            <ActivateAccountVerifyBusinessPage save={addVehicleInfo} />
+            <DriverVehicleInformation save={addVehicleInfo} />
             {/* <ActivatedriverAccountConnectWalletPage login={login} /> */}
             <div className="h-px w-[93%] mt-[30px] ml-6 bg-gray-100" />
           </div>

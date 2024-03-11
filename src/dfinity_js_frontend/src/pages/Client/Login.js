@@ -17,7 +17,7 @@ const Login = ({ login }) => {
         <Button
           onClick={login}
           variant="outline"
-          className="rounded-pill px-3 mt-3"
+          className="rounded-pill btn btn-outline-success mx-auto px-3 mt-3"
         >
           Connect Wallet
         </Button>

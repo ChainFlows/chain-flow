@@ -19,9 +19,14 @@ import {
   getClientCompanyNewOrders,
 } from "../../../utils/clientCompany";
 import { toast } from "react-toastify";
-import { assignSupplier, createOrderDetails } from "../../../utils/orders";
+import {
+  assignSupplier,
+  createOrderDetails,
+  markOrderAsCompleted,
+} from "../../../utils/orders";
 import AddOrder from "../../order/AddOrder";
 import ViewBids from "../Bids";
+import PaySupplier from "../components/PaySupplier";
 
 const dropDownOptions = [
   { label: "Option1", value: "option1" },
@@ -74,6 +79,36 @@ export default function CompanyOverviewPage({ client }) {
       console.log(error);
       setLoading(false);
       toast(<NotificationError text="Failed to assign supplier." />);
+    }
+  };
+
+  // pay supplier
+  const paySupplierFunc = async (data) => {
+    try {
+      setLoading(true);
+      data.amount = parseInt(data.amount, 10) * 10 ** 8;
+      console.log(data);
+      // await paySupplier(data);
+      toast(<NotificationSuccess text="Supplier paid successfully." />);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      toast(<NotificationError text="Failed to pay supplier." />);
+    }
+  };
+
+  // mark order as delivered
+  const markDelivered = async (data) => {
+    try {
+      setLoading(true);
+      await markOrderAsCompleted(data);
+      toast(<NotificationSuccess text="Order marked as delivered." />);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      toast(<NotificationError text="Failed to mark order as delivered." />);
     }
   };
 
@@ -245,18 +280,18 @@ export default function CompanyOverviewPage({ client }) {
                     <Tabs
                       className="flex flex-col items-start justify-end w-full p-[21px] bg-blue_gray-900_0c shadow-xs rounded-[19px]"
                       selectedTabClassName="!text-gray-900_01 bg-blue_gray-900_0c shadow-xs rounded-[20px]"
-                      selectedTabPanelClassName="mt-[88px] mb-[7px] ml-[7px] relative tab-panel--selected"
+                      selectedTabPanelClassName="mt-[20px] mb-[7px] ml-[7px] relative tab-panel--selected"
                     >
                       <Text size="6xl" as="p" className="mt-4 ml-[9px]">
                         Jobs
                       </Text>
-                      <div className="flex flex-col items-start justify-start w-[58%] mt-6 gap-[29px]">
-                        <TabList className="flex flex-row justify-start items-center p-3 bg-white-A700_01 shadow-xs rounded-[25px]">
+                      <div className="flex flex-col items-start justify-between w-full mt-4 gap-[29px] ">
+                        <TabList className="flex flex-row justify-between mt-2 w-[98%] items-center p-3 bg-white-A700_01 shadow-xs rounded-[25px]">
                           <Tab className="mt-0.5 ml-[13px] text-gray-900_01 text-[11px] font-normal">
                             <Button
                               color="blue_gray_900_0c"
                               size="6xl"
-                              className="ml-px min-w-[200px] rounded-[20px]"
+                              className="ml-px rounded-[20px]"
                               onClick={() => setTab("new")}
                             >
                               New Orders
@@ -266,7 +301,7 @@ export default function CompanyOverviewPage({ client }) {
                             <Button
                               color="blue_gray_900_0c"
                               size="6xl"
-                              className="ml-px min-w-[200px] rounded-[20px]"
+                              className="ml-px rounded-[20px]"
                               onClick={() => setTab("maintainance")}
                             >
                               Current Orders
@@ -276,7 +311,7 @@ export default function CompanyOverviewPage({ client }) {
                             <Button
                               color="blue_gray_900_0c"
                               size="6xl"
-                              className="ml-px min-w-[200px] rounded-[20px]"
+                              className="ml-px rounded-[20px]"
                               onClick={() => setTab("completed")}
                             >
                               Completed Orders
@@ -378,6 +413,13 @@ export default function CompanyOverviewPage({ client }) {
                                                 as="p"
                                                 className="mb-px "
                                               >
+                                                {order.orderStatus}
+                                              </Text>
+                                              <Text
+                                                size="2xl"
+                                                as="p"
+                                                className="mb-px "
+                                              >
                                                 {order.priority}
                                               </Text>
                                               <Text
@@ -385,7 +427,7 @@ export default function CompanyOverviewPage({ client }) {
                                                 as="p"
                                                 className="mb-px "
                                               >
-                                                {order.category}
+                                                {order.expectedDelivery}
                                               </Text>
                                               <Text
                                                 size="2xl"
@@ -399,10 +441,9 @@ export default function CompanyOverviewPage({ client }) {
                                               <Text size="2xl" as="p">
                                                 {order.deliveryAddress}
                                               </Text>
-                                              <ViewBids
-                                                order={order}
-                                                save={assignSupplierBid}
-                                              />
+                                              <Text size="2xl" as="p">
+                                                {order.supplierId}
+                                              </Text>
                                             </div>
                                           </div>
                                         </div>
@@ -436,7 +477,7 @@ export default function CompanyOverviewPage({ client }) {
                                                 as="p"
                                                 className="mb-px "
                                               >
-                                                {order.priority}
+                                                {order.delivery}
                                               </Text>
                                               <Text
                                                 size="2xl"
@@ -450,6 +491,13 @@ export default function CompanyOverviewPage({ client }) {
                                                 as="p"
                                                 className="mb-px "
                                               >
+                                                {order.orderType}
+                                              </Text>
+                                              <Text
+                                                size="2xl"
+                                                as="p"
+                                                className="mb-px "
+                                              >
                                                 {order.orderWeight}
                                               </Text>
                                             </div>
@@ -457,9 +505,13 @@ export default function CompanyOverviewPage({ client }) {
                                               <Text size="2xl" as="p">
                                                 {order.deliveryAddress}
                                               </Text>
-                                              <ViewBids
+                                              <Text size="2xl" as="p">
+                                                {order.supplierId}
+                                              </Text>
+                                              <PaySupplier
                                                 order={order}
-                                                save={assignSupplierBid}
+                                                save={paySupplierFunc}
+                                                markDelivered={markDelivered}
                                               />
                                             </div>
                                           </div>

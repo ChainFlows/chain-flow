@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
+import { Button as BButton, Modal, Form, FloatingLabel } from "react-bootstrap";
+import { Button } from "../../components/utils";
 
 const MaintainanceRecord = ({ save }) => {
   const [vehicleRegNo, setVehicleRegNo] = useState("");
@@ -23,10 +24,10 @@ const MaintainanceRecord = ({ save }) => {
       <Button
         onClick={handleShow}
         color="blue_gray_900_02"
-        size="8xl"
-        className="ml-[9px] min-w-[264px] rounded-[20px]"
+        size="11xl"
+        className="min-w-[115px] items-center gap-2 flex rounded-[28px]"
       >
-        Create MaintainanceRecord
+        Add MaintainanceRecord
       </Button>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
@@ -145,10 +146,10 @@ const MaintainanceRecord = ({ save }) => {
             </FloatingLabel>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose}>
+            <BButton variant="secondary" onClick={handleClose}>
               Close
-            </Button>
-            <Button
+            </BButton>
+            <BButton
               variant="dark"
               onClick={() => {
                 save({
@@ -166,7 +167,7 @@ const MaintainanceRecord = ({ save }) => {
               }}
             >
               Save
-            </Button>
+            </BButton>
           </Modal.Footer>
         </Form>
       </Modal>
