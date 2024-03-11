@@ -8,7 +8,6 @@ const AddOrder = ({ save }) => {
   const [expectedDelivery, setExpectedDelivery] = useState("");
   const [pickupAddress, setPickupAddress] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [orderStatus, setOrderStatus] = useState("");
   const [orderType, setOrderType] = useState("");
   const [orderWeight, setOrderWeight] = useState("");
   const [priority, setPriority] = useState("");
@@ -25,7 +24,7 @@ const AddOrder = ({ save }) => {
       <Button
         onClick={handleShow}
         color="blue_gray_900_02"
-        size="16xl"
+        size="11xl"
         className="min-w-[115px] items-center gap-2 flex rounded-[28px]"
       >
         <i className="bi bi-plus"></i> Add Order
@@ -55,7 +54,7 @@ const AddOrder = ({ save }) => {
               className="mb-3"
             >
               <Form.Control
-                type="text"
+                type="date"
                 placeholder="Expected Delivery"
                 onChange={(e) => {
                   setExpectedDelivery(e.target.value);
@@ -88,19 +87,7 @@ const AddOrder = ({ save }) => {
                 }}
               />
             </FloatingLabel>
-            <FloatingLabel
-              controlId="inputOrderStatus"
-              label="Order Status"
-              className="mb-3"
-            >
-              <Form.Control
-                type="text"
-                placeholder="Order Status"
-                onChange={(e) => {
-                  setOrderStatus(e.target.value);
-                }}
-              />
-            </FloatingLabel>
+
             <FloatingLabel
               controlId="inputOrderType"
               label="Order Type"
@@ -179,7 +166,6 @@ const AddOrder = ({ save }) => {
                   expectedDelivery,
                   pickupAddress,
                   deliveryAddress,
-                  orderStatus,
                   orderType,
                   orderWeight,
                   priority,

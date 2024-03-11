@@ -3,7 +3,7 @@ import { Img, Text, Button, Input, SelectBox } from "../../../components/utils";
 
 import * as Images from "../../../assets/images";
 
-export default function ActivateAccountVerifyBusinessPage({ save }) {
+export default function DriverVehicleInformation({ save }) {
   // usestate for form inputs
   const [vehicleMake, setVehicleMake] = React.useState("");
   const [vehicleModel, setVehicleModel] = React.useState("");
@@ -12,15 +12,14 @@ export default function ActivateAccountVerifyBusinessPage({ save }) {
 
   return (
     <>
-      <div className="flex flex-row justify-start items-start w-[96%] mt-6 gap-[21px]">
-        <div className="flex flex-col items-center justify-center w-[30%] p-[17px] bg-white-A700_01 rounded-[12px]">
-          <div className="flex flex-col items-start justify-start w-[92%]">
-            <div className="flex flex-row justify-start items-center w-full bg-green-50 p-2 rounded-md border border-gray-500 text-black mt-[-1px] gap-3">
+      <div className="flex flex-row justify-start items-start mt-6 w-full gap-[21px]">
+        <div className="flex flex-col items-center justify-center w-[30%] mr-[17px]  bg-white-A700_01 rounded-[12px]">
+          <div className="flex flex-col items-start justify-start">
+            <div className="flex flex-row justify-start items-center w-full p-2 rounded-md text-black mt-[-1px] gap-3">
               <div className="h-[338px] w-[11%] relative">
                 <div className="h-[322px] w-px top-[1%] right-0 left-0 m-auto bg-gray-400_02 absolute" />
-                <div className="flex flex-col items-end justify-center w-full bg-green-50 p-2 rounded-md border border-gray-500 text-black h-full left-0 bottom-0 right-0 top-0 m-auto absolute">
-                  <div className="h-[87px] w-[2px] mr-3 bg-lime-500" />
-                  <div className="flex flex-col items-center justify-start w-full bg-green-50 p-2 rounded-md border border-gray-500 text-black gap-[83px]">
+                <div className="flex flex-col items-end justify-center w-full  p-2 rounded-md text-black h-full left-0 bottom-0 right-0 top-0 m-auto absolute">
+                  <div className="flex flex-col items-center justify-start w-full  p-2 rounded-md text-black gap-[83px]">
                     <Text
                       size="3xl"
                       as="p"
@@ -31,7 +30,7 @@ export default function ActivateAccountVerifyBusinessPage({ save }) {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-start justify-start w-[85%] gap-[90px]">
+              <div className="flex flex-col items-start justify-start w-[90%] gap-[90px]">
                 <Text size="5xl" as="p">
                   Vehicle Infomation
                 </Text>

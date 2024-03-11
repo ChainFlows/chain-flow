@@ -22,13 +22,17 @@ import {
   getSupplyCompanyCompletedOrders,
   getSupplyCompanyNewOrders,
 } from "../../../utils/supplyCompany";
-import { updateOrderStatus } from "../../../utils/orders";
+import { assignDriver, updateOrderStatus } from "../../../utils/orders";
 import CreateQuotation from "../../quatation/CreateQuatation";
+import AssignDrivers from "../components/AssignDriver";
+import UpdateStatus from "../components/UpdateStatus";
+import PayDriver from "../components/PayDriver";
 
-const dropDownOptions = [
-  { label: "Option1", value: "option1" },
-  { label: "Option2", value: "option2" },
-  { label: "Option3", value: "option3" },
+const stauses = [
+  { label: "Delivered", value: "delivered" },
+  { label: "Picked up", value: "picked-up" },
+  { label: "On transit", value: "on-transit" },
+  { label: "At delivery", value: "at-delivery" },
 ];
 
 export default function CompanyOverviewPage({ supplier }) {
@@ -65,6 +69,22 @@ export default function CompanyOverviewPage({ supplier }) {
     }
   };
 
+  // assigndriver
+  const saveDriver = async (id, driverId) => {
+    try {
+      setLoading(true);
+      await assignDriver(id, driverId);
+      fetchNewOrders();
+      fetchCurrentOrders();
+      toast(<NotificationSuccess text="Driver assigned successfully." />);
+    } catch (error) {
+      console.log(error);
+      toast(<NotificationError text="Failed to assign driver." />);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // update order status
   const orderStatusUpdate = async (status) => {
     try {
@@ -77,6 +97,20 @@ export default function CompanyOverviewPage({ supplier }) {
     } catch (error) {
       console.log(error);
       toast(<NotificationError text="Failed to update order status." />);
+    }
+  };
+
+  // pay driver
+  const payDriverFunc = async (data) => {
+    try {
+      setLoading(true);
+      console.log(data);
+      toast(<NotificationSuccess text="Driver paid successfully." />);
+    } catch (error) {
+      console.log(error);
+      toast(<NotificationError text="Failed to pay driver." />);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,7 +131,7 @@ export default function CompanyOverviewPage({ supplier }) {
     try {
       setLoading(true);
       const orders = await getSupplyCompanyNewOrders(id);
-      console.log("new orders",orders)
+      console.log("new orders", orders);
       setNewOrders(orders);
       setLoading(false);
     } catch (error) {
@@ -211,7 +245,6 @@ export default function CompanyOverviewPage({ supplier }) {
                             }
                             name="search"
                             placeholder="Search by SKU"
-                            options={dropDownOptions}
                             className="w-[23%] gap-px !text-gray-400_02 shadow-xl rounded-[15px]"
                           />
                         </div>
@@ -262,45 +295,45 @@ export default function CompanyOverviewPage({ supplier }) {
                     <Tabs
                       className="flex flex-col items-start justify-end w-full p-[21px] bg-blue_gray-900_0c shadow-xs rounded-[19px]"
                       selectedTabClassName="!text-gray-900_01 bg-blue_gray-900_0c shadow-xs rounded-[20px]"
-                      selectedTabPanelClassName="mt-[88px] mb-[7px] ml-[7px] relative tab-panel--selected"
+                      selectedTabPanelClassName="mt-[20px] mb-[7px] ml-[7px] relative tab-panel--selected"
                     >
                       <Text size="6xl" as="p" className="mt-4 ml-[9px]">
                         Jobs
                       </Text>
-                      {/* <div className="flex flex-col items-start justify-start  mt-6 gap-[29px]"> */}
-                      <TabList className="flex flex-row justify-between w-[98%] mt-2 ml-[9px] gap-[130px] p-[17px]">
-                        <Tab className="mt-0.5 ml-[13px] text-gray-900_01 text-[11px] font-normal">
-                          <Button
-                            color="blue_gray_900_0c"
-                            size="6xl"
-                            className="ml-px rounded-[20px]"
-                            onClick={() => setTab("new")}
-                          >
-                            New Orders
-                          </Button>
-                        </Tab>
-                        <Tab className="mt-0.5 ml-[13px] text-gray-900_01 text-[11px] font-normal">
-                          <Button
-                            color="blue_gray_900_0c"
-                            size="6xl"
-                            className="ml-px rounded-[20px]"
-                            onClick={() => setTab("current")}
-                          >
-                            Current Orders
-                          </Button>
-                        </Tab>
-                        <Tab className="mt-0.5 ml-[13px] text-gray-900_01 text-[11px] font-normal">
-                          <Button
-                            color="blue_gray_900_0c"
-                            size="6xl"
-                            className="ml-px rounded-[20px]"
-                            onClick={() => setTab("completed")}
-                          >
-                            Completed Orders
-                          </Button>
-                        </Tab>
-                      </TabList>
-                      {/* </div> */}
+                      <div className="flex flex-col items-start justify-start w-full  mt-4 gap-[29px]">
+                        <TabList className="flex flex-row justify-between w-[98%] mt-2 p-3 items-center bg-white-A700_01 gap-[130px] shadow-xs rounded-[25px]">
+                          <Tab className="mt-0.5 text-gray-900_01 text-[11px] font-normal">
+                            <Button
+                              color="blue_gray_900_0c"
+                              size="6xl"
+                              className="ml-px rounded-[20px]"
+                              onClick={() => setTab("new")}
+                            >
+                              New Orders
+                            </Button>
+                          </Tab>
+                          <Tab className="mt-0.5 text-gray-900_01 text-[11px] font-normal">
+                            <Button
+                              color="blue_gray_900_0c"
+                              size="6xl"
+                              className="ml-px rounded-[20px]"
+                              onClick={() => setTab("current")}
+                            >
+                              Current Orders
+                            </Button>
+                          </Tab>
+                          <Tab className="mt-0.5 text-gray-900_01 text-[11px] font-normal">
+                            <Button
+                              color="blue_gray_900_0c"
+                              size="6xl"
+                              className="ml-px rounded-[20px]"
+                              onClick={() => setTab("completed")}
+                            >
+                              Completed Orders
+                            </Button>
+                          </Tab>
+                        </TabList>
+                      </div>
                       {[...Array(3)].map((_, index) => (
                         <TabPanel
                           key={`tab-panel${index}`}
@@ -333,6 +366,13 @@ export default function CompanyOverviewPage({ supplier }) {
                                                 {order.orderName}
                                               </Text>
                                               <Text
+                                                size="3xl"
+                                                as="p"
+                                                className="mb-px "
+                                              >
+                                                {order.companyName}
+                                              </Text>
+                                              <Text
                                                 size="2xl"
                                                 as="p"
                                                 className="mb-px "
@@ -358,10 +398,10 @@ export default function CompanyOverviewPage({ supplier }) {
                                               <Text size="2xl" as="p">
                                                 {order.deliveryAddress}
                                               </Text>
-                                              {/* <CreateQuotation
+                                              <AssignDrivers
                                                 order={order}
-                                                save={saveQuotation}
-                                              /> */}
+                                                save={saveDriver}
+                                              />
                                             </div>
                                           </div>
                                         </div>
@@ -416,10 +456,11 @@ export default function CompanyOverviewPage({ supplier }) {
                                               <Text size="2xl" as="p">
                                                 {order.deliveryAddress}
                                               </Text>
-                                              {/* <ViewBids
-                                                order={order}
-                                                save={saveQuotation}
-                                              /> */}
+                                              <UpdateStatus
+                                                id={id}
+                                                status={stauses}
+                                                save={orderStatusUpdate}
+                                              />
                                             </div>
                                           </div>
                                         </div>
@@ -474,10 +515,10 @@ export default function CompanyOverviewPage({ supplier }) {
                                               <Text size="2xl" as="p">
                                                 {order.deliveryAddress}
                                               </Text>
-                                              {/* <ViewBids
+                                              <PayDriver
                                                 order={order}
-                                                save={assignSupplierBid}
-                                              /> */}
+                                                save={payDriverFunc}
+                                              />
                                             </div>
                                           </div>
                                         </div>

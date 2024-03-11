@@ -67,11 +67,13 @@ export const SupplyCompany = Record({
   regNo: text,
   logo: text,
   drivers: Vec(Driver), // This will be a list of drivers id
+  reviews: Vec(text), // This will be a list of reviews
 });
 
 export const OrderDetails = Record({
   id: text,
   companyId: text, // This is the id of the company that is placing the order
+  companyName: text, // This is the name of the company that is placing the order
   orderName: text,
   expectedDelivery: text, // This is the client expected Date and Time
   delivery: Opt(text), // This is the supplier delivery Date and Time
@@ -158,7 +160,6 @@ export const OrderDetailsPayload = Record({
   expectedDelivery: text, // This is the client expected Date and Time
   pickupAddress: text,
   deliveryAddress: text,
-  orderStatus: text, // This is the status of the order
   orderType: text, // This is the type of the order eg(Standard, Fragile, etc)
   orderWeight: text, // This is the weight of the order
   priority: text, // This is the priority of the order eg(Low, Medium, High)
@@ -191,6 +192,7 @@ export const UpdateDriverPayload = Record({
 export const CompletionPayload = Record({
   id: text,
   condition: text,
+  review: text,
 });
 
 export const Message = Variant({

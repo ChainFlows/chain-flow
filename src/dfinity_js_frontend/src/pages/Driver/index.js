@@ -6,7 +6,7 @@ import DriverDashboard from "./DriverDashboard";
 
 import { getDriverByOwner } from "../../utils/driver";
 import { Loader } from "../../components/utils";
-import ActivateDriverAccountVerifyBusinessPage from "./ActivateDriverAccountVerifyBusiness";
+import ActivateDriverAccount from "./ActivateDriverAccount";
 
 const Driver = () => {
   const [driver, setDriver] = useState({});
@@ -30,8 +30,6 @@ const Driver = () => {
     }
   });
 
-
-
   console.log("driver", driver);
 
   useEffect(() => {
@@ -45,12 +43,10 @@ const Driver = () => {
         !loading ? (
           driver?.fullName ? (
             <main>
-              <DriverDashboard driver={driver} />
+              <DriverDashboard fetchDriver={fetchDriver} driver={driver} />
             </main>
           ) : (
-            <ActivateDriverAccountVerifyBusinessPage
-              fetchDriver={fetchDriver}
-            />
+            <ActivateDriverAccount fetchDriver={fetchDriver} />
           )
         ) : (
           <Loader />

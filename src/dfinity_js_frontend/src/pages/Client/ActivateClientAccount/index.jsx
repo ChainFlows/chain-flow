@@ -39,13 +39,13 @@ export default function ActivateClientAccount({ fetchClient }) {
         fetchClient();
       });
 
-      setInterval(() => {
-        timerInSeconds += 1;
+      // setInterval(() => {
+      //   timerInSeconds += 1;
 
-        if (timerInSeconds >= 2) {
-          window.location.reload();
-        }
-      }, 1000);
+      //   if (timerInSeconds >= 1) {
+      //     window.location.reload();
+      //   }
+      // }, 1000);
     } catch (error) {
       console.log(error);
     }
@@ -136,8 +136,8 @@ export default function ActivateClientAccount({ fetchClient }) {
                     </Text>
                     <input
                       type="text"
-                      name="bussinessType"
-                      placeholder="Business type"
+                      name="ownerName"
+                      placeholder="Owner Name"
                       className="w-full bg-green-50 p-2 rounded-md border border-gray-500 text-black"
                       onChange={(e) => setOwnerName(e.target.value)}
                     />
