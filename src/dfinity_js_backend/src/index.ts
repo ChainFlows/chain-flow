@@ -2,7 +2,6 @@ import {
   query,
   update,
   text,
-  Record,
   StableBTreeMap,
   Variant,
   Vec,
@@ -12,7 +11,6 @@ import {
   Err,
   ic,
   Principal,
-  Opt,
   nat64,
   Duration,
   Result,
@@ -25,7 +23,6 @@ import {
   binaryAddressFromPrincipal,
   hexAddressFromPrincipal,
 } from "azle/canisters/ledger";
-import { id } from "azle/src/lib/ic/id";
 //@ts-ignore
 import { hashCode } from "hashcode";
 import { v4 as uuidv4 } from "uuid";
@@ -58,8 +55,10 @@ const maintainanceRecordStorage = StableBTreeMap(
   Types.MaintainanceRecord
 );
 const driverStorage = StableBTreeMap(5, text, Types.Driver);
+const pendingReserves = StableBTreeMap(6, nat64, Types.ReservePayment);
+const persistedReserves = StableBTreeMap(7, Principal, Types.ReservePayment);
 
-const ORDER_RESERVATION_PERIOD = 120n; // reservation period in seconds
+const PAYMENT_RESERVATION_PERIOD = 120n; // reservation period in seconds
 
 /* 
     initialization of the Ledger canister. The principal text value is hardcoded because 
@@ -871,6 +870,114 @@ export default Canister({
       return records;
     }
   ),
+
+  // If i have order Id i can access the Supplier Id and then get quatation on it
+  // create a Reserve Payment
+  createReservePay: update(
+    [text],
+    Result(Types.ReservePayment, Types.Message),
+    (orderId) => {
+      const orderOpt = orderDetailsStorage.get(orderId);
+      if ("None" in orderOpt) {
+        return Err({
+          NotFound: `cannot reserve Payment: Order  with id=${orderId} not available`,
+        });
+      }
+      const order = orderOpt.Some;
+      const supplierId = order.supplierId.Some;
+      console.log("supplierId", supplierId);
+
+      // Get quatation using supplierId and orderId
+      const approvedQuatation = quotationStorage.values().find((quotation) => {
+        return (
+          quotation.supplierId === supplierId &&
+          quotation.orderId === orderId &&
+          quotation.quotationStatus === "approved"
+        );
+      });
+      console.log("approvedQuatation", approvedQuatation);
+
+      const cost = approvedQuatation.shippingCost;
+
+      // Get the supplier details
+      const clientOpt = clientsCompanyStorage.get(order.companyId);
+      if ("None" in clientOpt) {
+        return Err({
+          NotFound: `client company with id=${order.companyId} not found`,
+        });
+      }
+      const client = clientOpt.Some;
+      const owner = client.owner;
+
+      const supplierOpt = supplyCompanyStorage.get(supplierId);
+      if ("None" in supplierOpt) {
+        return Err({ NotFound: `supplier with id=${supplierId} not found` });
+      }
+      const supplier = supplierOpt.Some;
+      const supplierOwner = supplier.owner;
+
+      console.log("cor Id", orderId);
+      const reservePayment = {
+        SupplierId: order.supplierId.Some,
+        price: cost,
+        status: "pending",
+        clientPayer: owner,
+        supplierReceiver: supplierOwner,
+        paid_at_block: None,
+        memo: generateCorrelationId(orderId),
+      };
+
+      console.log("reservePayment", reservePayment);
+      pendingReserves.insert(reservePayment.memo, reservePayment);
+      discardByTimeout(reservePayment.memo, PAYMENT_RESERVATION_PERIOD);
+      return Ok(reservePayment);
+    }
+  ),
+
+  completePayment: update(
+    [Principal, text, nat64, nat64, nat64],
+    Result(Types.ReservePayment, Types.Message),
+    async (reservor, orderId, reservePrice, block, memo) => {
+      const paymentVerified = await verifyPaymentInternal(
+        reservor,
+        reservePrice,
+        block,
+        memo
+      );
+      if (!paymentVerified) {
+        return Err({
+          NotFound: `cannot complete the reserve: cannot verify the payment, memo=${memo}`,
+        });
+      }
+      const pendingReservePayOpt = pendingReserves.remove(memo);
+      if ("None" in pendingReservePayOpt) {
+        return Err({
+          NotFound: `cannot complete the reserve: there is no pending reserve with id=${orderId}`,
+        });
+      }
+      const reservedPay = pendingReservePayOpt.Some;
+      const updatedReservePayment = {
+        ...reservedPay,
+        status: "completed",
+        paid_at_block: Some(block),
+      };
+      const orderOpt = orderDetailsStorage.get(orderId);
+      if ("None" in orderOpt) {
+        throw Error(`Book with id=${orderId} not found`);
+      }
+      const order = orderOpt.Some;
+      orderDetailsStorage.insert(order.id, order);
+      persistedReserves.insert(ic.caller(), updatedReservePayment);
+      return Ok(updatedReservePayment);
+    }
+  ),
+  verifyPayment: query(
+    [Principal, nat64, nat64, nat64],
+    bool,
+    async (receiver, amount, block, memo) => {
+      return await verifyPaymentInternal(receiver, amount, block, memo);
+    }
+  ),
 });
 
 function generateDriverRating(
@@ -918,6 +1025,14 @@ function dateRating(expected: text, deliveryDate: text) {
   }
 }
 
+/*
+    a hash function that is used to generate correlation ids for orders.
+    also, we use that in the verifyPayment function where we check if the used has actually paid the order
+*/
+function hash(input: any): nat64 {
+  return BigInt(Math.abs(hashCode().value(input)));
+}
+
 // a workaround to make uuid package work with Azle
 globalThis.crypto = {
   // @ts-ignore
@@ -931,3 +1046,41 @@ globalThis.crypto = {
     return array;
   },
 };
+
+// HELPER FUNCTIONS
+function generateCorrelationId(orderId: text): nat64 {
+  const correlationId = `${orderId}_${ic.caller().toText()}_${ic.time()}`;
+  return hash(correlationId);
+}
+
+function discardByTimeout(memo: nat64, delay: Duration) {
+  ic.setTimer(delay, () => {
+    const order = pendingReserves.remove(memo);
+    console.log(`Reserve discarded ${order}`);
+  });
+}
+async function verifyPaymentInternal(
+  receiver: Principal,
+  amount: nat64,
+  block: nat64,
+  memo: nat64
+): Promise<bool> {
+  const blockData = await ic.call(icpCanister.query_blocks, {
+    args: [{ start: block, length: 1n }],
+  });
+  const tx = blockData.blocks.find((block) => {
+    if ("None" in block.transaction.operation) {
+      return false;
+    }
+    const operation = block.transaction.operation.Some;
+    const senderAddress = binaryAddressFromPrincipal(ic.caller(), 0);
+    const receiverAddress = binaryAddressFromPrincipal(receiver, 0);
+    return (
+      block.transaction.memo === memo &&
+      hash(senderAddress) === hash(operation.Transfer?.from) &&
+      hash(receiverAddress) === hash(operation.Transfer?.to) &&
+      amount === operation.Transfer?.amount.e8s
+    );
+  });
+  return tx ? true : false;
+}
