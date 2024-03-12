@@ -201,3 +201,18 @@ export const Message = Variant({
   PaymentFailed: text,
   PaymentCompleted: text,
 });
+
+export const PaymentStatus = Variant({
+  PaymentPending: text,
+  Completed: text,
+});
+
+export const ReservePayment = Record({
+  SupplierId: text,
+  price: nat64,
+  status: text,
+  clientPayer: Principal,
+  supplierReceiver: Principal,
+  paid_at_block: Opt(nat64),
+  memo: nat64,
+});
