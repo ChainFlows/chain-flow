@@ -29,7 +29,7 @@ import UpdateStatus from "../components/UpdateStatus";
 import PayDriver from "../components/PayDriver";
 
 const stauses = [
-  { label: "Delivered", value: "delivered" },
+  { label: "Completed", value: "completed" },
   { label: "Picked up", value: "picked-up" },
   { label: "On transit", value: "on-transit" },
   { label: "At delivery", value: "at-delivery" },
@@ -53,7 +53,7 @@ export default function CompanyOverviewPage({ supplier }) {
     try {
       setLoading(true);
 
-      data.shippingCost = parseInt(data.shippingCost, 10);
+      data.shippingCost = parseInt(data.shippingCost, 10) * 10 ** 8;
 
       await createQuotation(data).then((resp) => {
         console.log(resp);
@@ -86,10 +86,11 @@ export default function CompanyOverviewPage({ supplier }) {
   };
 
   // update order status
-  const orderStatusUpdate = async (status) => {
+  const orderStatusUpdate = async (orderId, status) => {
     try {
       setLoading(true);
-      await updateOrderStatus(id, status);
+      console.log(orderId, status);
+      await updateOrderStatus(orderId, status);
 
       fetchCompletedOrders();
       fetchCurrentOrders();
@@ -457,7 +458,7 @@ export default function CompanyOverviewPage({ supplier }) {
                                                 {order.deliveryAddress}
                                               </Text>
                                               <UpdateStatus
-                                                id={id}
+                                                id={order.id}
                                                 status={stauses}
                                                 save={orderStatusUpdate}
                                               />

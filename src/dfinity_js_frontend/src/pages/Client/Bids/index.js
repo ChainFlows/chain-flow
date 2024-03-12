@@ -107,7 +107,7 @@ function TableRow({ bid, id, save, handleClose }) {
       <td>{bid.supplierName}</td>
       <td>{bid.supplierEmail}</td>
       <td>{bid.serviceDescription}</td>
-      <td>{Number(bid.shippingCost)}</td>
+      <td>{Number(bid.shippingCost) / 10 ** 8}</td>
       <td>
         <BButton
           variant="dark"

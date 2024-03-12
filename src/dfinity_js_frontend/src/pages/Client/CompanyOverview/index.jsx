@@ -17,6 +17,7 @@ import {
   getClientCompanyActiveOrders,
   getClientCompanyCompletedOrders,
   getClientCompanyNewOrders,
+  paySupplier,
 } from "../../../utils/clientCompany";
 import { toast } from "react-toastify";
 import {
@@ -83,13 +84,14 @@ export default function CompanyOverviewPage({ client }) {
   };
 
   // pay supplier
-  const paySupplierFunc = async (data) => {
+  const paySupplierFunc = async (orderId) => {
     try {
       setLoading(true);
-      data.amount = parseInt(data.amount, 10) * 10 ** 8;
-      console.log(data);
-      // await paySupplier(data);
-      toast(<NotificationSuccess text="Supplier paid successfully." />);
+      await paySupplier({ orderId }).then((resp) => {
+        console.log("resp", resp);
+        fetchCompletedOrders();
+        toast(<NotificationSuccess text="Supplier paid successfully." />);
+      });
       setLoading(false);
     } catch (error) {
       console.log(error);

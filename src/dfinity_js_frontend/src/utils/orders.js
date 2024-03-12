@@ -92,9 +92,9 @@ export async function assignSupplier(orderId, supplierId) {
   
   }
   
-  export async function markOrderAsDelivered(completionPayload) {
+  export async function markOrderAsCompleted(completionPayload) {
     try {
-      return await window.canister.chainflow.markOrderAsDelivered(completionPayload);
+      return await window.canister.chainflow.markOrderAsCompleted(completionPayload);
     } catch (err) {
       if (err.name === "AgentHTTPResponseError") {
         const authClient = window.auth.client;

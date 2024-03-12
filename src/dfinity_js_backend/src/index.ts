@@ -447,6 +447,17 @@ export default Canister({
       }
       const orderDetails = orderDetailsOpt.Some;
       orderDetails.supplierId = Some(supplierId);
+      // change Quataion status
+      const quotations = quotationStorage.values();
+      const quotation = quotations.find(
+        (quotation) =>
+          quotation.orderId === orderId && quotation.supplierId === supplierId
+      );
+      if (quotation) {
+        quotation.quotationStatus = "approved";
+        quotationStorage.insert(quotation.id, quotation);
+      }
+
       orderDetailsStorage.insert(orderDetails.id, orderDetails);
       return Ok(orderDetails);
     }
@@ -500,12 +511,15 @@ export default Canister({
     [text, text],
     Result(Types.OrderDetails, Types.Message),
     (orderId, status) => {
+      console.log(orderId, status);
       const orderDetailsOpt = orderDetailsStorage.get(orderId);
+      console.log(orderDetailsOpt, "det opt");
       if ("None" in orderDetailsOpt) {
         return Err({ NotFound: `order details with id=${orderId} not found` });
       }
       const orderDetails = orderDetailsOpt.Some;
       orderDetails.orderStatus = status;
+      console.log(orderDetails);
       orderDetailsStorage.insert(orderDetails.id, orderDetails);
       return Ok(orderDetails);
     }
