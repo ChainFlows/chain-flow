@@ -139,11 +139,27 @@ export async function addProduct(clientId, productName) {
   }
 }
 
-// export async function buyProduct(product) {
-//   const chainflowCanister = window.canister.chainflow;
-//   const orderResponse = await chainflowCanister.createOrder(product.id);
-//   const sellerPrincipal = Principal.from(orderResponse.Ok.seller);
-//   const sellerAddress = await chainflowCanister.getAddressFromPrincipal(sellerPrincipal);
-//   const block = await transferICP(sellerAddress, orderResponse.Ok.price, orderResponse.Ok.memo);
-//   await chainflowCanister.completePurchase(sellerPrincipal, product.id, orderResponse.Ok.price, block, orderResponse.Ok.memo);
-// }
+//driver can be  paid arnd 10% of cost
+export async function paySupplier(order) {
+  const chainflowCanister = window.canister.chainflow;
+  console.log("my Order", order);
+  console.log("first", order.orderId);
+  const orderResponse = await chainflowCanister.createReservePay(order.orderId);
+  console.log("orderResponse", orderResponse);
+  const sellerPrincipal = Principal.from(orderResponse.Ok.supplierReceiver);
+  const sellerAddress = await chainflowCanister.getAddressFromPrincipal(
+    sellerPrincipal
+  );
+  const block = await transferICP(
+    sellerAddress,
+    orderResponse.Ok.price,
+    orderResponse.Ok.memo
+  );
+  await chainflowCanister.completePayment(
+    sellerPrincipal,
+    order.orderId,
+    orderResponse.Ok.price,
+    block,
+    orderResponse.Ok.memo
+  );
+}

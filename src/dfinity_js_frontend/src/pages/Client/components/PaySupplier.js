@@ -5,7 +5,6 @@ import { Button } from "../../../components/utils";
 
 const PaySupplier = ({ order, save, markDelivered }) => {
   const [show, setShow] = useState(false);
-  const [amount, setAmount] = useState("");
   const [review, setReview] = useState("");
   const [condition, seCondition] = useState("");
 
@@ -27,19 +26,6 @@ const PaySupplier = ({ order, save, markDelivered }) => {
         </Modal.Header>
         <Form>
           <Modal.Body>
-            <FloatingLabel
-              controlId="inputAmount"
-              label="Amount"
-              className="mb-3"
-            >
-              <Form.Control
-                type="number"
-                placeholder="Amount"
-                onChange={(e) => {
-                  setAmount(e.target.value);
-                }}
-              />
-            </FloatingLabel>
             <FloatingLabel controlId="review" label="Review" className="mb-3">
               <Form.Control
                 type="text"
@@ -61,7 +47,7 @@ const PaySupplier = ({ order, save, markDelivered }) => {
                   seCondition(e.target.value);
                 }}
               >
-                <option selected>Condition</option>
+                <option defaultValue="">Condition</option>
                 <option value="perfect">Perfect</option>
                 <option value="good">Good</option>
                 <option value="average">Average</option>
@@ -76,10 +62,7 @@ const PaySupplier = ({ order, save, markDelivered }) => {
             <BButton
               variant="dark"
               onClick={() => {
-                save({
-                  supplierId: order.supplierId,
-                  amount,
-                });
+                save(order.id);
                 markDelivered({
                   orderId: order.id,
                   review,
