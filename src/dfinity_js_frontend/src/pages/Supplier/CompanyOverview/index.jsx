@@ -21,6 +21,7 @@ import {
   getSupplyCompanyActiveOrders,
   getSupplyCompanyCompletedOrders,
   getSupplyCompanyNewOrders,
+  payDriver,
 } from "../../../utils/supplyCompany";
 import { assignDriver, updateOrderStatus } from "../../../utils/orders";
 import CreateQuotation from "../../quatation/CreateQuatation";
@@ -100,12 +101,20 @@ export default function CompanyOverviewPage({ supplier }) {
       toast(<NotificationError text="Failed to update order status." />);
     }
   };
+ 
 
   // pay driver
   const payDriverFunc = async (data) => {
+    const {orderId} = data
+    const amount = parseInt(data.amount, 10) * 10 ** 8;
+
     try {
       setLoading(true);
-      console.log(data);
+      await payDriver({ orderId }, amount).then((resp) => {
+        console.log("resp", resp);
+        fetchCompletedOrders();
+        toast(<NotificationSuccess text="Driver paid successfully." />);
+      });
       toast(<NotificationSuccess text="Driver paid successfully." />);
     } catch (error) {
       console.log(error);

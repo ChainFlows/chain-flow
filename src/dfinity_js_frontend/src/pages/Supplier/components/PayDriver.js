@@ -47,13 +47,13 @@ const PayDriver = ({ order, save }) => {
               variant="dark"
               onClick={() => {
                 save({
-                  driverId: order.driverId,
+                  orderId: order.id,
                   amount,
                 });
                 handleClose();
               }}
             >
-              Save
+              Complete
             </BButton>
           </Modal.Footer>
         </Form>
