@@ -1,3 +1,6 @@
+import { Principal } from "@dfinity/principal";
+import { transferICP } from "./ledger";
+
 export async function createSupplyCompany(supplyCompany) {
   return window.canister.chainflow.createSupplyCompany(supplyCompany);
 }
@@ -130,3 +133,29 @@ export async function addDriver(companyId, driverId) {
     return {};
   }
 }
+
+//driver can be  paid arnd 10% of cost
+export async function payDriver(order,amount) {
+  const chainflowCanister = window.canister.chainflow;
+  console.log("my Order", order);
+  console.log("first", order.orderId);
+  const orderResponse = await chainflowCanister.createReserveDriverPay(order.orderId,amount);
+  console.log("orderResponse", orderResponse);
+  const driverPrincipal = Principal.from(orderResponse.Ok.driverReciever);
+  const driverAddress = await chainflowCanister.getAddressFromPrincipal(
+    driverPrincipal
+  );
+  const block = await transferICP(
+    driverAddress,
+    orderResponse.Ok.price,
+    orderResponse.Ok.memo
+  );
+  await chainflowCanister.completeDriverPayment(
+    driverPrincipal,
+    order.orderId,
+    orderResponse.Ok.price,
+    block,
+    orderResponse.Ok.memo
+  );
+}
+

@@ -216,3 +216,13 @@ export const ReservePayment = Record({
   paid_at_block: Opt(nat64),
   memo: nat64,
 });
+
+export const ReserveDriverPayment = Record({
+  SupplierId: text,
+  price: nat64,
+  status: text,
+  supplierPayer: Principal,
+  driverReciever: Principal,
+  paid_at_block: Opt(nat64),
+  memo: nat64,
+});

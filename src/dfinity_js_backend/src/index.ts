@@ -57,6 +57,10 @@ const maintainanceRecordStorage = StableBTreeMap(
 const driverStorage = StableBTreeMap(5, text, Types.Driver);
 const pendingReserves = StableBTreeMap(6, nat64, Types.ReservePayment);
 const persistedReserves = StableBTreeMap(7, Principal, Types.ReservePayment);
+const pendingDriverReserves = StableBTreeMap(8, nat64, Types.ReserveDriverPayment);
+const persistedDriverReserves = StableBTreeMap(9, Principal, Types.ReserveDriverPayment);
+
+
 
 const PAYMENT_RESERVATION_PERIOD = 120n; // reservation period in seconds
 
@@ -985,6 +989,105 @@ export default Canister({
       return Ok(updatedReservePayment);
     }
   ),
+
+
+
+
+  // create a Driver Reserve Payment
+  createReserveDriverPay: update(
+    [text, nat64],
+    Result(Types.ReserveDriverPayment, Types.Message),
+    (orderId, amount) => {
+      const orderOpt = orderDetailsStorage.get(orderId);
+      if ("None" in orderOpt) {
+        return Err({
+          NotFound: `cannot reserve Payment: Order  with id=${orderId} not available`,
+        });
+      }
+      const order = orderOpt.Some;
+      const supplierId = order.supplierId.Some;
+      const driverId = order.driverId.Some;
+      console.log("supplierId", supplierId);
+
+      const driverOpt = driverStorage.get(driverId);
+      if ("None" in driverOpt) {
+        return Err({
+          NotFound: `Driver  with id=${driverId} not found`,
+        });
+      }
+      
+      const driver = driverOpt.Some;
+      const driverOwner = driver.owner
+
+      console.log("driverId", driverId)
+
+      const cost = amount;
+
+      const supplierOpt = supplyCompanyStorage.get(supplierId);
+      if ("None" in supplierOpt) {
+        return Err({ NotFound: `supplier with id=${supplierId} not found` });
+      }
+      const supplier = supplierOpt.Some;
+      const supplierOwner = supplier.owner;
+
+      console.log("cor Id", orderId);
+      const reserveDriverPayment = {
+        SupplierId: order.supplierId.Some,
+        price: cost,
+        status: "pending",
+        supplierPayer: supplierOwner,
+        driverReciever: driverOwner,
+        paid_at_block: None,
+        memo: generateCorrelationId(orderId),
+      };
+
+      console.log("reserveDriverPayment", reserveDriverPayment);
+      pendingDriverReserves.insert(reserveDriverPayment.memo, reserveDriverPayment);
+      discardByTimeout(reserveDriverPayment.memo, PAYMENT_RESERVATION_PERIOD);
+      return Ok(reserveDriverPayment);
+    }
+  ),
+
+
+
+  completeDriverPayment: update(
+    [Principal, text, nat64, nat64, nat64],
+    Result(Types.ReserveDriverPayment, Types.Message),
+    async (reservor, orderId, reservePrice, block, memo) => {
+      const paymentVerified = await verifyPaymentInternal(
+        reservor,
+        reservePrice,
+        block,
+        memo
+      );
+      if (!paymentVerified) {
+        return Err({
+          NotFound: `cannot complete the reserve: cannot verify the payment, memo=${memo}`,
+        });
+      }
+      const pendingReservePayOpt = pendingDriverReserves.remove(memo);
+      if ("None" in pendingReservePayOpt) {
+        return Err({
+          NotFound: `cannot complete the reserve: there is no pending reserve with id=${orderId}`,
+        });
+      }
+      const reservedPay = pendingReservePayOpt.Some;
+      const updatedReservePayment = {
+        ...reservedPay,
+        status: "completed",
+        paid_at_block: Some(block),
+      };
+      const orderOpt = orderDetailsStorage.get(orderId);
+      if ("None" in orderOpt) {
+        throw Error(`Book with id=${orderId} not found`);
+      }
+      const order = orderOpt.Some;
+      orderDetailsStorage.insert(order.id, order);
+      persistedDriverReserves.insert(ic.caller(), updatedReservePayment);
+      return Ok(updatedReservePayment);
+    }
+  ),
+
   verifyPayment: query(
     [Principal, nat64, nat64, nat64],
     bool,
