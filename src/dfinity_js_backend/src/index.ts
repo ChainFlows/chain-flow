@@ -57,10 +57,16 @@ const maintainanceRecordStorage = StableBTreeMap(
 const driverStorage = StableBTreeMap(5, text, Types.Driver);
 const pendingReserves = StableBTreeMap(6, nat64, Types.ReservePayment);
 const persistedReserves = StableBTreeMap(7, Principal, Types.ReservePayment);
-const pendingDriverReserves = StableBTreeMap(8, nat64, Types.ReserveDriverPayment);
-const persistedDriverReserves = StableBTreeMap(9, Principal, Types.ReserveDriverPayment);
-
-
+const pendingDriverReserves = StableBTreeMap(
+  8,
+  nat64,
+  Types.ReserveDriverPayment
+);
+const persistedDriverReserves = StableBTreeMap(
+  9,
+  Principal,
+  Types.ReserveDriverPayment
+);
 
 const PAYMENT_RESERVATION_PERIOD = 120n; // reservation period in seconds
 
@@ -523,6 +529,8 @@ export default Canister({
       }
       const orderDetails = orderDetailsOpt.Some;
       orderDetails.orderStatus = status;
+      status === "completed" &&
+        (orderDetails.delivery = new Date().toISOString());
       console.log(orderDetails);
       orderDetailsStorage.insert(orderDetails.id, orderDetails);
       return Ok(orderDetails);
@@ -990,9 +998,6 @@ export default Canister({
     }
   ),
 
-
-
-
   // create a Driver Reserve Payment
   createReserveDriverPay: update(
     [text, nat64],
@@ -1015,11 +1020,11 @@ export default Canister({
           NotFound: `Driver  with id=${driverId} not found`,
         });
       }
-      
-      const driver = driverOpt.Some;
-      const driverOwner = driver.owner
 
-      console.log("driverId", driverId)
+      const driver = driverOpt.Some;
+      const driverOwner = driver.owner;
+
+      console.log("driverId", driverId);
 
       const cost = amount;
 
@@ -1042,13 +1047,14 @@ export default Canister({
       };
 
       console.log("reserveDriverPayment", reserveDriverPayment);
-      pendingDriverReserves.insert(reserveDriverPayment.memo, reserveDriverPayment);
+      pendingDriverReserves.insert(
+        reserveDriverPayment.memo,
+        reserveDriverPayment
+      );
       discardByTimeout(reserveDriverPayment.memo, PAYMENT_RESERVATION_PERIOD);
       return Ok(reserveDriverPayment);
     }
   ),
-
-
 
   completeDriverPayment: update(
     [Principal, text, nat64, nat64, nat64],

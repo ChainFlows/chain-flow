@@ -101,11 +101,10 @@ export default function CompanyOverviewPage({ supplier }) {
       toast(<NotificationError text="Failed to update order status." />);
     }
   };
- 
 
   // pay driver
   const payDriverFunc = async (data) => {
-    const {orderId} = data
+    const { orderId } = data;
     const amount = parseInt(data.amount, 10) * 10 ** 8;
 
     try {
@@ -287,15 +286,15 @@ export default function CompanyOverviewPage({ supplier }) {
                                 <Text size="2xl" as="p">
                                   July
                                 </Text>
-                                <div className="flex flex-row justify-between w-auto">
-                                  <Text as="p" className="mt-[3px]">
-                                    August
-                                  </Text>
-                                  <Text as="p">Septemb</Text>
-                                  <Text as="p">October</Text>
-                                  <Text as="p">Novembe</Text>
-                                  <Text as="p">Decembe</Text>
-                                </div>
+                                {/* <div className="flex flex-row justify-between w-auto"> */}
+                                <Text as="p" className="">
+                                  August
+                                </Text>
+                                <Text as="p">Septemb</Text>
+                                <Text as="p">October</Text>
+                                <Text as="p">Novembe</Text>
+                                <Text as="p">Decembe</Text>
+                                {/* </div> */}
                               </div>
                             </div>
                           </div>
@@ -626,12 +625,13 @@ export default function CompanyOverviewPage({ supplier }) {
                           Expand Your Customer Base
                         </Text>
                         <Text as="p" className="mt-[31px] ml-px">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing
-                          elit. Sed faucibus, elit sed
+                          Expanding your customer base is crucial for the growth
+                          and success of your business.
                         </Text>
-                        <Text as="p" className="mt-2.5 ml-px">
-                          pellentesque bibendum, est ligula feugiat libero, eu
-                          convallis justo est et elit. Nulla
+                        <Text as="p" className="mt-[31px] ml-px">
+                          By reaching out to new demographics and markets, you
+                          can unlock untapped potential and increase your
+                          revenue streams
                         </Text>
                         <div className="flex flex-row justify-start mt-[30px]">
                           <Button

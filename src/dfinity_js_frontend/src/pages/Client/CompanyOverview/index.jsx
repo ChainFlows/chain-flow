@@ -534,12 +534,13 @@ export default function CompanyOverviewPage({ client }) {
                           Expand Your Customer Base
                         </Text>
                         <Text as="p" className="mt-[31px] ml-px">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing
-                          elit. Sed faucibus, elit sed
+                          Expanding your customer base is crucial for the growth
+                          and success of your business.
                         </Text>
-                        <Text as="p" className="mt-2.5 ml-px">
-                          pellentesque bibendum, est ligula feugiat libero, eu
-                          convallis justo est et elit. Nulla
+                        <Text as="p" className="mt-[31px] ml-px">
+                          By reaching out to new demographics and markets, you
+                          can unlock untapped potential and increase your
+                          revenue streams
                         </Text>
                         <div className="flex flex-row justify-start mt-[30px]">
                           <Button

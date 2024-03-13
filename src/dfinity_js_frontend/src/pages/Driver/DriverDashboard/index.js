@@ -205,27 +205,25 @@ export default function DriverDashboard({ driver, fetchDriver }) {
                             {/* </div> */}
                           </div>
                           <div className="w-[68%]">
-                            
                             <table className="table">
                               <thead className="thead-dark">
-                                {tab === "completed" ? ( 
-                                <tr>
-                                  <th scope="col">OrderName</th>
-                                  <th scope="col">CompanyName</th>
-                                  <th scope="col">Category</th>
-                                  <th scope="col">Weight</th>
-                                  <th scope="col">Delivery</th>
-                                  <th scope="col">OrderType</th>
-                                </tr>
+                                {tab === "completed" ? (
+                                  <tr>
+                                    <th scope="col">OrderName</th>
+                                    <th scope="col">CompanyName</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Weight</th>
+                                    <th scope="col">Delivery</th>
+                                    <th scope="col">OrderType</th>
+                                  </tr>
                                 ) : (
-                                <tr>
-                                  <th scope="col">vehicleRegNo</th>
-                                  <th scope="col">date</th>
-                                  <th scope="col">mechanic</th>
-                                  <th scope="col">mechanicPhone</th>
-                                  <th scope="col">cost</th>
-                                </tr>
-
+                                  <tr>
+                                    <th scope="col">vehicleRegNo</th>
+                                    <th scope="col">date</th>
+                                    <th scope="col">mechanic</th>
+                                    <th scope="col">mechanicPhone</th>
+                                    <th scope="col">cost</th>
+                                  </tr>
                                 )}
                               </thead>
                             </table>
@@ -278,7 +276,7 @@ export default function DriverDashboard({ driver, fetchDriver }) {
                       </Text>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-4 w-[68%]">
+                  <div className="flex flex-col gap-4 w-[68%] mb-96">
                     {tab === "maintainance" &&
                       maintainanceRecords.map((maintainance, index) => (
                         <div
@@ -305,13 +303,12 @@ export default function DriverDashboard({ driver, fetchDriver }) {
                                 </Text>
                               </div>
                               <div className="flex justify-between">
-
-                              <Text size="2xl" as="p" className="mt-[10px]">
-                                desc: {maintainance.description}
-                              </Text>
-                              <Text size="2xl" as="p" className="mt-[10px]">
-                                desc: {maintainance.mechanicAddress}
-                              </Text>
+                                <Text size="2xl" as="p" className="mt-[10px]">
+                                  desc: {maintainance.description}
+                                </Text>
+                                <Text size="2xl" as="p" className="mt-[10px]">
+                                  desc: {maintainance.mechanicAddress}
+                                </Text>
                               </div>
                             </div>
                           </div>
@@ -324,17 +321,17 @@ export default function DriverDashboard({ driver, fetchDriver }) {
                           className="flex flex-row justify-center w-full p-2 bg-white-A700_01 shadow-xs rounded-[12px]"
                         >
                           <div className="flex flex-row justify-between items-center w-[95%] gap-[17px]">
-                            <Img
+                            {/* <Img
                               src={Images.img_image_389}
                               alt="image389_one"
                               className="w-[86px] object-cover rounded-[12px]"
-                            />
-                            <div className="flex flex-col w-[84%]">
-                              <div className="flex flex-row justify-start items-center">
-                                <Text as="p" size="2xl" className="ml-[5px]">
+                            /> */}
+                            <div className="flex flex-col w-full">
+                              <div className="flex flex-row justify-between items-center">
+                                <Text as="p" size="2xl" className="mb-px">
                                   {order.orderName}
                                 </Text>
-                                <Text size="2xl" as="p" className="mt-[10px]">
+                                <Text size="2xl" as="p" className="mb-px">
                                   {order.companyName}
                                 </Text>
                                 <Text size="2xl" as="p" className="mb-px">
@@ -352,13 +349,13 @@ export default function DriverDashboard({ driver, fetchDriver }) {
                               </div>
                               <div className="flex justify-between">
                                 <Text size="2xl" as="p" className="mt-[10px]">
-                                  Address:{order.deliveryAddress}
+                                  Address: {order.deliveryAddress}
                                 </Text>
                                 <Text size="2xl" as="p" className="mt-[10px]">
-                                  Order Id:{order.id}
+                                  OrderId: {order.id}
                                 </Text>
                                 <Text size="2xl" as="p" className="mt-[10px]">
-                                  Supplier:{order.supplierId}
+                                  Supplier: {order.supplierId}
                                 </Text>
                               </div>
                             </div>
@@ -366,34 +363,7 @@ export default function DriverDashboard({ driver, fetchDriver }) {
                         </div>
                       ))}
 
-                    <div className="flex mb-96 flex-row justify-center w-full p-[7px] bg-white-A700_01 shadow-xs rounded-[12px]">
-                      <div className="flex flex-row justify-start items-center w-[95%] gap-[19px]">
-                        <Img
-                          src={Images.img_image_381}
-                          alt="image381_one"
-                          className="w-[84px] object-cover rounded-[12px]"
-                        />
-                        <div className="flex flex-col w-[84%]">
-                          <div className="flex flex-row justify-between items-center">
-                            <Text size="3xl" as="p" className="mb-px ">
-                              {"vehicleRegNo"}
-                            </Text>
-                            <Text size="2xl" as="p" className="mb-px ">
-                              {"date"}
-                            </Text>
-                            <Text size="2xl" as="p" className="mb-px ">
-                              {"mechanic"}
-                            </Text>
-                            <Text size="2xl" as="p" className="mb-px ">
-                              {"cost"}
-                            </Text>
-                          </div>
-                          <Text size="lg" as="p" className="mt-[10px]">
-                            {"description"}
-                          </Text>
-                        </div>
-                      </div>
-                    </div>
+                    
                   </div>
                 </div>
               </div>

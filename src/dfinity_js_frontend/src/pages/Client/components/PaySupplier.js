@@ -18,7 +18,7 @@ const PaySupplier = ({ order, save, markDelivered }) => {
         size="8xl"
         className="min-w-[115px] items-center gap-2 flex rounded-[28px]"
       >
-        <i className="bi bi-plus"></i> Pay Supplier
+        <i className="bi bi-wallet2"></i> Pay Supplier
       </Button>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>

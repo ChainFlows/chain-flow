@@ -17,7 +17,7 @@ const PayDriver = ({ order, save }) => {
         size="11xl"
         className="min-w-[115px] items-center gap-2 flex rounded-[28px]"
       >
-        <i className="bi bi-plus"></i> Pay Driver
+        <i className="bi bi-wallet2"></i> Pay Driver
       </Button>
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
